@@ -54,3 +54,9 @@ export const App: React.FC = () => {
 };
 
 export default App;
+
+//Routing: It defines which URL leads to which page (e.g., / goes to the Home page, while /search goes to the Search Results).
+
+// Global Providers: If you use "Context" (like a Theme for dark mode or a User context to keep track of who is logged in), the providers wrap everything here.
+
+// Layout Structure: It often contains components that should appear on every page, like your Navbar or Footer.
