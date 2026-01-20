@@ -7,18 +7,19 @@ export const Header: React.FC = () => {
     //state variable for track the search query
     const [searchQuery, setSearchQuery] = useState(''); 
 
+    //function to handle search form submission
     const handleSearch = (e: React.FormEvent) => {
-    //prevent default form submission behavior
     e.preventDefault(); 
     if (searchQuery.trim()){ //removes any whitespace from both ends of the string
         navigate(`/search?q=${encodeURIComponent(searchQuery)}`); //send user to the search results pagge with the search query as a URL parameter
         setSearchQuery(''); //clear the search input field
     }
     }  
-
-const handleNavigation = (path: string) => {
-    navigate(path);
-}
+    
+    //function to handle navigation when nav links are clicked
+    const handleNavigation = (path: string) => {
+        navigate(path);
+    }
 
 return (
       <header className="header">
