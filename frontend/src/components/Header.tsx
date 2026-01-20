@@ -7,9 +7,6 @@ export const Header: React.FC = () => {
     //state variable for track the search query
     const [searchQuery, setSearchQuery] = useState(''); 
 
-    // State for profile menu toggle
-    const  [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false); 
-
     const handleSearch = (e: React.FormEvent) => {
     //prevent default form submission behavior
     e.preventDefault(); 
@@ -70,48 +67,14 @@ return (
               📚 My Modules
             </button>
 
-            {/* Profile Section */}
-            <div className="profile-dropdown">
-              <button
-                className="nav-link profile-link"
-                onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
-                aria-label="Profile Menu"
-              >
-                👤 Profile
-              </button>
-              {isProfileMenuOpen && (
-                <div className="dropdown-menu">
-                  <button
-                    className="dropdown-item"
-                    onClick={() => {
-                      handleNavigation('/profile');
-                      setIsProfileMenuOpen(false);
-                    }}
-                  >
-                    View Profile
-                  </button>
-                  <button
-                    className="dropdown-item"
-                    onClick={() => {
-                      handleNavigation('/settings');
-                      setIsProfileMenuOpen(false);
-                    }}
-                  >
-                    Settings
-                  </button>
-                  <hr className="dropdown-divider" />
-                  <button
-                    className="dropdown-item logout"
-                    onClick={() => {
-                      handleNavigation('/login');
-                      setIsProfileMenuOpen(false);
-                    }}
-                  >
-                    Logout
-                  </button>
-                </div>
-              )}
-            </div>
+            {/* Profile */}
+            <button
+              className="nav-link"
+              onClick={() => handleNavigation('/profile')}
+              aria-label="Profile"
+            >
+              👤 Profile
+            </button>
           </nav>
         </div>
       </header>
