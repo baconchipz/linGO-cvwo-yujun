@@ -99,7 +99,7 @@ export const Header: React.FC = () => {
                 size="small"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search module codes (e.g., CS1101S)..."
+                placeholder="Search module codes"
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start" sx={{ color: '#9fb6d6' }}>
