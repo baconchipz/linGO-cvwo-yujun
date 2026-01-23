@@ -1,24 +1,27 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Header } from './components/Header';
 import './App.css';
-import { Users } from './pages/Users'; // Importing Users component
+import { Users } from './pages/Users';
+import { Home } from './pages/Home';
 
 export const App: React.FC = () => {
+    const [openCreatePost, setOpenCreatePost] = useState(false);
+
     return (
         <Router>
             <div className="app-container">
-                <Header />
+                <Header onPostClick={() => setOpenCreatePost(true)} />
                 <main className="main-content">
                     <Routes>
-                        <Route
-                            path="/"
+                        <Route 
+                            path="/" 
                             element={
-                                <div className="placeholder">
-                                    <h2>Welcome to linGO Forum!</h2>
-                                    <p>Home / Feed page coming soon...</p>
-                                </div>
-                            }
+                                <Home 
+                                    openCreatePost={openCreatePost}
+                                    onCloseCreatePost={() => setOpenCreatePost(false)}
+                                />
+                            } 
                         />
                         <Route
                             path="/modules"

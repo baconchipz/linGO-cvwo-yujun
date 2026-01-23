@@ -12,7 +12,11 @@ import {
   InputAdornment,
 } from '@mui/material';
 
-export const Header: React.FC = () => {
+interface HeaderProps {
+  onPostClick?: () => void;
+}
+
+export const Header: React.FC<HeaderProps> = ({ onPostClick }) => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -47,9 +51,9 @@ export const Header: React.FC = () => {
             backdropFilter: 'blur(8px)',
           }}
         >
-          <Toolbar disableGutters sx={{ px: 2, minHeight: 72, gap: 2 }}>
-            {/* Logo / brand */}
-            <Stack direction="row" spacing={1.5} alignItems="center">
+          <Toolbar disableGutters sx={{ px: 2, minHeight: 72, gap: 2, justifyContent: 'space-between' }}>
+            {/* Left: Logo + Nav links */}
+            <Stack direction="row" spacing={2} alignItems="center">
               <Box
                 onClick={() => handleNavigation('/')}
                 sx={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 1 }}
@@ -68,32 +72,28 @@ export const Header: React.FC = () => {
                   linGO
                 </Typography>
               </Box>
+
+              <Stack direction="row" spacing={1} alignItems="center">
+                <Button color="inherit" sx={{ color: '#dce8ff', textTransform: 'none', fontWeight: 600 }}
+                  onClick={() => handleNavigation('/')}
+                >
+                  Home
+                </Button>
+                <Button color="inherit" sx={{ color: '#dce8ff', textTransform: 'none', fontWeight: 600 }}
+                  onClick={() => handleNavigation('/modules')}
+                >
+                  My Modules
+                </Button>
+                <Button color="inherit" sx={{ color: '#dce8ff', textTransform: 'none', fontWeight: 600 }}
+                  onClick={() => handleNavigation('/profile')}
+                >
+                  Profile
+                </Button>
+              </Stack>
             </Stack>
 
-            {/* Nav links */}
-            <Stack direction="row" spacing={1.5} alignItems="center" sx={{ ml: 2 }}>
-              <Button color="inherit" sx={{ color: '#dce8ff', textTransform: 'none', fontWeight: 600 }}
-                onClick={() => handleNavigation('/')}
-              >
-                Home
-              </Button>
-              <Button color="inherit" sx={{ color: '#dce8ff', textTransform: 'none', fontWeight: 600 }}
-                onClick={() => handleNavigation('/modules')}
-              >
-                My Modules
-              </Button>
-              <Button color="inherit" sx={{ color: '#dce8ff', textTransform: 'none', fontWeight: 600 }}
-                onClick={() => handleNavigation('/profile')}
-              >
-                Profile
-              </Button>
-            </Stack>
-
-            {/* Spacer */}
-            <Box sx={{ flexGrow: 1 }} />
-
-            {/* Search */}
-            <Box component="form" onSubmit={handleSearch} sx={{ minWidth: 260 }}>
+            {/* Center: Search */}
+            <Box component="form" onSubmit={handleSearch} sx={{ minWidth: 300, maxWidth: 400, flex: 1, mx: 4 }}>
               <TextField
                 fullWidth
                 size="small"
@@ -115,6 +115,23 @@ export const Header: React.FC = () => {
                 }}
               />
             </Box>
+
+            {/* Right: Post button */}
+            <Button
+              variant="contained"
+              onClick={onPostClick}
+              sx={{
+                bgcolor: '#0079d3',
+                color: '#fff',
+                textTransform: 'none',
+                fontWeight: 600,
+                px: 3,
+                borderRadius: '20px',
+                '&:hover': { bgcolor: '#1484d6' },
+              }}
+            >
+              Post
+            </Button>
           </Toolbar>
         </Paper>
       </Box>

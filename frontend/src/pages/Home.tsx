@@ -10,14 +10,21 @@ import {
   Stack,
   Divider,
   Container,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
 } from '@mui/material';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
-import ThumbDownIcon from '@mui/icons-material/ThumbDown';
 import CommentIcon from '@mui/icons-material/ChatBubbleOutline';
-import ShareIcon from '@mui/icons-material/Share';
 import { Post, ApiResponse } from '../types/api';
 
-export const Home: React.FC = () => {
+interface HomeProps {
+  openCreatePost: boolean;
+  onCloseCreatePost: () => void;
+}
+
+export const Home: React.FC<HomeProps> = ({ openCreatePost, onCloseCreatePost }) => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -60,6 +67,7 @@ export const Home: React.FC = () => {
       .then(() => {
         setTitle('');
         setBody('');
+        onCloseCreatePost();
         fetchPosts();
       })
       .catch(err => setError(err.message));
@@ -69,14 +77,25 @@ export const Home: React.FC = () => {
   if (error) return <Box sx={{ p: 3 }}><Typography color="error">Error: {error}</Typography></Box>;
 
   return (
-    <Container maxWidth="md" sx={{ py: 3 }}>
-      {/* Create Post Card */}
-      <Card sx={{ mb: 2, bgcolor: '#1a1a1b', borderRadius: 2 }}>
-        <CardContent>
-          <Typography variant="h6" sx={{ mb: 2, color: '#d7dadc' }}>
-            Create Post
-          </Typography>
-          <Box component="form" onSubmit={handleSubmit}>
+    <>
+      {/* Create Post Modal */}
+      <Dialog 
+        open={openCreatePost} 
+        onClose={onCloseCreatePost}
+        maxWidth="sm"
+        fullWidth
+        PaperProps={{
+          sx: {
+            bgcolor: '#1a1a1b',
+            borderRadius: 2,
+          }
+        }}
+      >
+        <DialogTitle sx={{ color: '#d7dadc', borderBottom: '1px solid #343536' }}>
+          Create Post
+        </DialogTitle>
+        <DialogContent sx={{ pt: 3 }}>
+          <Box component="form" onSubmit={handleSubmit} id="create-post-form">
             <TextField
               fullWidth
               placeholder="Title"
@@ -98,13 +117,12 @@ export const Home: React.FC = () => {
             <TextField
               fullWidth
               multiline
-              rows={3}
+              rows={6}
               placeholder="What's on your mind?"
               value={body}
               onChange={(e) => setBody(e.target.value)}
               required
               sx={{
-                mb: 2,
                 '& .MuiInputBase-root': {
                   bgcolor: '#272729',
                   color: '#d7dadc',
@@ -115,23 +133,34 @@ export const Home: React.FC = () => {
                 },
               }}
             />
-            <Button
-              type="submit"
-              variant="contained"
-              sx={{
-                bgcolor: '#0079d3',
-                textTransform: 'none',
-                fontWeight: 600,
-                px: 3,
-                '&:hover': { bgcolor: '#1484d6' },
-              }}
-            >
-              Post
-            </Button>
           </Box>
-        </CardContent>
-      </Card>
+        </DialogContent>
+        <DialogActions sx={{ p: 2, borderTop: '1px solid #343536' }}>
+          <Button 
+            onClick={onCloseCreatePost}
+            sx={{ color: '#818384', textTransform: 'none' }}
+          >
+            Cancel
+          </Button>
+          <Button
+            type="submit"
+            form="create-post-form"
+            variant="contained"
+            sx={{
+              bgcolor: '#0079d3',
+              textTransform: 'none',
+              fontWeight: 600,
+              px: 3,
+              '&:hover': { bgcolor: '#1484d6' },
+            }}
+          >
+            Post
+          </Button>
+        </DialogActions>
+      </Dialog>
 
+      {/* Posts Feed */}
+      <Container maxWidth="md" sx={{ py: 3 }}>
       {/* Posts Feed */}
       <Stack spacing={2}>
         {posts.map(post => (
@@ -153,9 +182,6 @@ export const Home: React.FC = () => {
                   <Typography sx={{ color: '#d7dadc', fontWeight: 600, fontSize: 14 }}>
                     {post.like_count}
                   </Typography>
-                  <IconButton size="small" sx={{ color: '#818384' }}>
-                    <ThumbDownIcon fontSize="small" />
-                  </IconButton>
                 </Box>
 
                 {/* Content Section */}
@@ -164,7 +190,7 @@ export const Home: React.FC = () => {
                     variant="caption"
                     sx={{ color: '#818384', display: 'block', mb: 0.5 }}
                   >
-                    Posted {new Date(post.created_at).toLocaleDateString()}
+                    Posted by User {post.user_id} • {new Date(post.created_at).toLocaleDateString()}
                   </Typography>
                   
                   <Typography
@@ -198,17 +224,6 @@ export const Home: React.FC = () => {
                     >
                       Comment
                     </Button>
-                    <Button
-                      startIcon={<ShareIcon />}
-                      size="small"
-                      sx={{
-                        color: '#818384',
-                        textTransform: 'none',
-                        '&:hover': { bgcolor: '#272729' },
-                      }}
-                    >
-                      Share
-                    </Button>
                   </Stack>
                 </Box>
               </Box>
@@ -217,5 +232,6 @@ export const Home: React.FC = () => {
         ))}
       </Stack>
     </Container>
+    </>
   );
 };
