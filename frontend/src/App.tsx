@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Header } from './components/Header';
 import './App.css';
+import { Users } from './pages/Users'; // Importing Users component
 
 export const App: React.FC = () => {
     return (
@@ -37,6 +38,11 @@ export const App: React.FC = () => {
                                 </div>
                             }
                         />
+                        <Route
+                            path="/users"
+                            element={<Users />} // Using Users component for /users route
+                        />
+                        
                         <Route
                             path="/search"
                             element={
