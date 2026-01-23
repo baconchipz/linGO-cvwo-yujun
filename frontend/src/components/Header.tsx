@@ -24,7 +24,14 @@ export const Header: React.FC<HeaderProps> = ({ onPostClick }) => {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      navigate(`/search?q=${encodeURIComponent(searchQuery)}`);
+      // Extract module ID from search (e.g., "CS2030" -> "2030", "1" -> "1")
+      const moduleMatch = searchQuery.match(/\d+/);
+      if (moduleMatch) {
+        const moduleId = moduleMatch[0];
+        navigate(`/module/${moduleId}`);
+      } else {
+        navigate(`/search?q=${encodeURIComponent(searchQuery)}`);
+      }
       setSearchQuery('');
     }
   };
@@ -51,9 +58,9 @@ export const Header: React.FC<HeaderProps> = ({ onPostClick }) => {
             backdropFilter: 'blur(8px)',
           }}
         >
-          <Toolbar disableGutters sx={{ px: 2, minHeight: 72, gap: 2, justifyContent: 'space-between' }}>
+          <Toolbar disableGutters sx={{ px: 2, minHeight: 72, gap: 2, display: 'flex', position: 'relative' }}>
             {/* Left: Logo + Nav links */}
-            <Stack direction="row" spacing={2} alignItems="center">
+            <Stack direction="row" spacing={2} alignItems="center" sx={{ flex: 1 }}>
               <Box
                 onClick={() => handleNavigation('/')}
                 sx={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 1 }}
@@ -92,8 +99,17 @@ export const Header: React.FC<HeaderProps> = ({ onPostClick }) => {
               </Stack>
             </Stack>
 
-            {/* Center: Search */}
-            <Box component="form" onSubmit={handleSearch} sx={{ minWidth: 300, maxWidth: 400, flex: 1, mx: 4 }}>
+            {/* Center: Search - Absolutely positioned */}
+            <Box 
+              component="form" 
+              onSubmit={handleSearch} 
+              sx={{ 
+                position: 'absolute',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                width: 350,
+              }}
+            >
               <TextField
                 fullWidth
                 size="small"
@@ -117,21 +133,23 @@ export const Header: React.FC<HeaderProps> = ({ onPostClick }) => {
             </Box>
 
             {/* Right: Post button */}
-            <Button
-              variant="contained"
-              onClick={onPostClick}
-              sx={{
-                bgcolor: '#0079d3',
-                color: '#fff',
-                textTransform: 'none',
-                fontWeight: 600,
-                px: 3,
-                borderRadius: '20px',
-                '&:hover': { bgcolor: '#1484d6' },
-              }}
-            >
-              Post
-            </Button>
+            <Stack direction="row" justifyContent="flex-end" sx={{ flex: 1 }}>
+              <Button
+                variant="contained"
+                onClick={onPostClick}
+                sx={{
+                  bgcolor: '#0079d3',
+                  color: '#fff',
+                  textTransform: 'none',
+                  fontWeight: 600,
+                  px: 3,
+                  borderRadius: '20px',
+                  '&:hover': { bgcolor: '#1484d6' },
+                }}
+              >
+                Post
+              </Button>
+            </Stack>
           </Toolbar>
         </Paper>
       </Box>

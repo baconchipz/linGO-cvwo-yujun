@@ -186,17 +186,29 @@ export const Home: React.FC<HomeProps> = ({ openCreatePost, onCloseCreatePost })
 
                 {/* Content Section */}
                 <Box sx={{ flex: 1 }}>
-                  <Typography
-                    variant="caption"
-                    sx={{ color: '#818384', display: 'block', mb: 0.5 }}
-                  >
-                    Posted by User {post.user_id} • {new Date(post.created_at).toLocaleDateString()}
-                  </Typography>
+                  <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 0.5 }}>
+                    <Typography
+                      variant="caption"
+                      sx={{ 
+                        color: '#d7dadc',
+                        fontWeight: 600,
+                        fontSize: 13,
+                      }}
+                    >
+                      m/CS{post.module_id}
+                    </Typography>
+                    <Typography
+                      variant="caption"
+                      sx={{ color: '#818384' }}
+                    >
+                      • Posted by User {post.user_id} • {new Date(post.created_at).toLocaleDateString()}
+                    </Typography>
+                  </Stack>
                   
                   <Typography
                     variant="h6"
                     sx={{
-                      color: '#d7dadc',
+                      color: '#ff5722',
                       fontWeight: 500,
                       mb: 1,
                       fontSize: 18,
