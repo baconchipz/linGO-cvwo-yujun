@@ -3,9 +3,8 @@ package routes
 import (
 	"encoding/json"
 	"net/http"
-
 	"modgo/internal/handlers/users"
-
+	"modgo/internal/handlers/posts"
 	"github.com/go-chi/chi/v5"
 )
 
@@ -38,6 +37,31 @@ func GetRoutes() func(r chi.Router) {
 				json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
 				return
 			}
+			json.NewEncoder(w).Encode(response)
+		})
+		// Posts endpoints
+		r.Get("/posts", func(w http.ResponseWriter, req *http.Request) {
+			response, err := posts.HandleList(w, req)
+
+			w.Header().Set("Content-Type", "application/json")
+			if err != nil {
+				w.WriteHeader(http.StatusInternalServerError)
+				json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+				return
+			}
+			json.NewEncoder(w).Encode(response)
+		})
+
+		r.Post("/posts", func(w http.ResponseWriter, req *http.Request) {
+			response, err := posts.HandleCreate(w, req)
+
+			w.Header().Set("Content-Type", "application/json")
+			if err != nil {
+				w.WriteHeader(http.StatusBadRequest)
+				json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+				return
+			}
+			w.WriteHeader(http.StatusCreated)
 			json.NewEncoder(w).Encode(response)
 		})
 	}
