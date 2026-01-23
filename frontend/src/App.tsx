@@ -42,7 +42,7 @@ export const App: React.FC = () => {
                             path="/users"
                             element={<Users />} // Using Users component for /users route
                         />
-                        
+
                         <Route
                             path="/search"
                             element={

@@ -9,3 +9,5 @@ require (
 	github.com/pkg/errors v0.9.1
 	golang.org/x/crypto v0.19.0
 )
+
+require github.com/go-chi/cors v1.2.2 // indirect

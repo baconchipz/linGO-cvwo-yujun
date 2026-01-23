@@ -7,7 +7,7 @@ export const Users: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        fetch('https://localhost:8080/users')
+        fetch('http://localhost:8080/users')
         .then(response => response.json())
         .then((data: ApiResponse<User[]>) => {
         setUsers(data.payload.data);
@@ -31,11 +31,11 @@ export const Users: React.FC = () => {
         <div>
             <h1>Users List</h1>
             <ul>
-                {users.map(user => (
-                    <li key={user.id}>
-                        {user.username} - {user.major} - Year {user.year}
-                    </li>
-                ))}
+            {users.map(user => (
+                <li key={user.id}>
+                {user.id} - {user.name} - {user.major} - Year {user.year}
+                </li>
+            ))}
             </ul>
         </div>
     );

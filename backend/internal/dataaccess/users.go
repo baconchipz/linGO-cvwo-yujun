@@ -11,7 +11,6 @@ func ListUsers(db *database.Database) ([]models.User, error) {
 		{
 			User_ID:    1,
 			Name:  "CVWO Student",
-			Email: "student@nus.edu.sg",
 			Major: "Computer Science",
 			Year:  3,
 		},
