@@ -25,9 +25,9 @@ export const Module: React.FC = () => {
     fetch('http://localhost:8080/posts')
       .then(response => response.json())
       .then((data: ApiResponse<Post[]>) => {
-        // Filter posts by module
+        // Filter posts by module code (case-insensitive)
         const modulePosts = data.payload.data.filter(
-          post => post.module_id === Number(moduleId)
+          post => post.module_id.toUpperCase() === moduleId?.toUpperCase()
         );
         setPosts(modulePosts);
         setLoading(false);
@@ -57,11 +57,11 @@ export const Module: React.FC = () => {
                 fontWeight: 700,
               }}
             >
-              CS
+              {moduleId?.replace(/\d+/g, '') || 'M'}
             </Avatar>
             <Box>
               <Typography variant="h4" sx={{ color: '#d7dadc', fontWeight: 700, mb: 0.5 }}>
-                m/CS{moduleId}
+                m/{moduleId}
               </Typography>
               <Typography sx={{ color: '#818384' }}>
                 Module • {posts.length} posts

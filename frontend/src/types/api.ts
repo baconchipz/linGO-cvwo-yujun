@@ -18,7 +18,7 @@ export interface Post {
   user_id: number;
   title: string;
   body: string;
-  module_id: number;
+  module_id: string;
   created_at: string;
   updated_at: string;
   like_count: number;

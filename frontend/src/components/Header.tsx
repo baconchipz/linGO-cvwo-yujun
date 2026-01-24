@@ -24,11 +24,11 @@ export const Header: React.FC<HeaderProps> = ({ onPostClick }) => {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      // Extract module ID from search (e.g., "CS2030" -> "2030", "1" -> "1")
-      const moduleMatch = searchQuery.match(/\d+/);
+      // Extract full module code (e.g., "CS2030", "cs2030", "2030")
+      const moduleMatch = searchQuery.match(/[a-zA-Z]*\d+/);
       if (moduleMatch) {
-        const moduleId = moduleMatch[0];
-        navigate(`/module/${moduleId}`);
+        const moduleCode = moduleMatch[0].toUpperCase();
+        navigate(`/module/${moduleCode}`);
       } else {
         navigate(`/search?q=${encodeURIComponent(searchQuery)}`);
       }

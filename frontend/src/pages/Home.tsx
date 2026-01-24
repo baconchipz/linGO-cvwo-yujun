@@ -195,7 +195,7 @@ export const Home: React.FC<HomeProps> = ({ openCreatePost, onCloseCreatePost })
                         fontSize: 13,
                       }}
                     >
-                      m/CS{post.module_id}
+                      m/{post.module_id}
                     </Typography>
                     <Typography
                       variant="caption"
