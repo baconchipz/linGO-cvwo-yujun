@@ -11,6 +11,7 @@ import { ProfilePostsTab } from '../components/ProfilePostsTab';
 import { ProfileCommentsTab } from '../components/ProfileCommentsTab';
 import { EditPostModal } from '../components/EditPostModal';
 import { DeleteConfirmDialog } from '../components/DeleteConfirmDialog';
+import { EditCommentModal } from '../components/EditCommentModal';
 
 export const Profile: React.FC = () => {
   const [activeTab, setActiveTab] = useState(0);
@@ -21,6 +22,9 @@ export const Profile: React.FC = () => {
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [deletingPostId, setDeletingPostId] = useState<number | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [editingComment, setEditingComment] = useState<Comment | null>(null);
+  const [deletingCommentId, setDeletingCommentId] = useState<number | null>(null);
+  const [isDeletingComment, setIsDeletingComment] = useState(false);
   // Mock user ID - replace with actual auth later
   const currentUserId = 1;
 
@@ -54,8 +58,13 @@ export const Profile: React.FC = () => {
         return Promise.all(commentPromises);
       })
       .then((commentsData: ApiResponse<Comment[]>[]) => {
-        const allComments = commentsData.flatMap(data => data.payload.data);
+        console.log('All comments data:', commentsData);
+        const allComments = commentsData
+          .flatMap(data => data.payload.data)
+          .filter(comment => comment !== null && comment !== undefined);
+        console.log('All comments flattened:', allComments);
         const userComments = allComments.filter(comment => comment.user_id === currentUserId);
+        console.log('User comments filtered:', userComments);
         setComments(userComments);
       })
       .catch(err => console.error('Failed to fetch comments:', err));
@@ -84,17 +93,33 @@ export const Profile: React.FC = () => {
             setIsDeleting(false);
         }
     };
-// Handle edit comment action
-  const handleEditComment = (comment: Comment) => {
-    // TODO: Open edit modal or inline edit
-    console.log('Edit comment:', comment);
-  };
+    // Handle edit comment action
+    const handleEditComment = (comment: Comment) => {
+        setEditingComment(comment);
+        console.log('Edit comment:', comment);
+    };
 
-  // Handle delete comment action
-  const handleDeleteComment = (commentId: number) => {
-    // TODO: Show confirmation and delete
-    console.log('Delete comment:', commentId);
-  };
+    // Handle delete comment action
+    const handleDeleteComment = async (commentId: number) => {
+    setIsDeletingComment(true);
+    const comment = comments.find(c => c.comment_id === commentId);
+    if (!comment) return;
+
+    try {
+        const response = await fetch(`http://localhost:8080/posts/${comment.post_id}/comments/${commentId}`, {
+        method: 'DELETE',
+        });
+
+        if (response.ok) {
+        fetchUserComments();
+        setDeletingCommentId(null);
+        }
+    } catch (error) {
+        console.error('Failed to delete comment:', error);
+    } finally {
+        setIsDeletingComment(false);
+    }
+    };
 
   if (loading) return <Box sx={{ p: 3 }}><Typography>Loading...</Typography></Box>;
 
@@ -147,9 +172,9 @@ export const Profile: React.FC = () => {
       
       {activeTab === 1 && (
         <ProfileCommentsTab 
-          comments={comments} 
-          onEdit={handleEditComment} 
-          onDelete={handleDeleteComment} 
+        comments={comments} 
+        onEdit={handleEditComment} 
+        onDelete={(commentId) => setDeletingCommentId(commentId)} 
         />
       )}
       <EditPostModal
@@ -168,6 +193,25 @@ export const Profile: React.FC = () => {
         onConfirm={() => deletingPostId && handleDeletePost(deletingPostId)}
         onCancel={() => setDeletingPostId(null)}
         isDeleting={isDeleting}
+        />
+
+        <EditCommentModal
+        open={editingComment !== null}
+        comment={editingComment}
+        onClose={() => setEditingComment(null)}
+        onCommentUpdated={() => {
+        fetchUserComments();
+        setEditingComment(null);
+        }}
+        />  
+
+        <DeleteConfirmDialog
+        open={deletingCommentId !== null}
+        title="Delete Comment"
+        message="Are you sure you want to delete this comment? This action cannot be undone."
+        onConfirm={() => deletingCommentId && handleDeleteComment(deletingCommentId)}
+        onCancel={() => setDeletingCommentId(null)}
+        isDeleting={isDeletingComment}
         />
     </Container>
   );
