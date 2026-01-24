@@ -2,9 +2,11 @@ package routes
 
 import (
 	"encoding/json"
-	"net/http"
-	"modgo/internal/handlers/users"
+	"modgo/internal/handlers/comments"
 	"modgo/internal/handlers/posts"
+	"modgo/internal/handlers/users"
+	"net/http"
+
 	"github.com/go-chi/chi/v5"
 )
 
@@ -15,7 +17,7 @@ func GetRoutes() func(r chi.Router) {
 			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(http.StatusOK)
 			json.NewEncoder(w).Encode(map[string]string{
-				"message": "modGO API",
+				"message":   "modGO API",
 				"endpoints": "/health, /users",
 			})
 		})
@@ -54,6 +56,32 @@ func GetRoutes() func(r chi.Router) {
 
 		r.Post("/posts", func(w http.ResponseWriter, req *http.Request) {
 			response, err := posts.HandleCreate(w, req)
+
+			w.Header().Set("Content-Type", "application/json")
+			if err != nil {
+				w.WriteHeader(http.StatusBadRequest)
+				json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+				return
+			}
+			w.WriteHeader(http.StatusCreated)
+			json.NewEncoder(w).Encode(response)
+		})
+
+		// Comments endpoints
+		r.Get("/posts/{postId}/comments", func(w http.ResponseWriter, req *http.Request) {
+			response, err := comments.HandleList(w, req)
+
+			w.Header().Set("Content-Type", "application/json")
+			if err != nil {
+				w.WriteHeader(http.StatusInternalServerError)
+				json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+				return
+			}
+			json.NewEncoder(w).Encode(response)
+		})
+
+		r.Post("/posts/{postId}/comments", func(w http.ResponseWriter, req *http.Request) {
+			response, err := comments.HandleCreate(w, req)
 
 			w.Header().Set("Content-Type", "application/json")
 			if err != nil {
