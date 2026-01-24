@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import {
   Box,
   Card,
@@ -18,6 +18,7 @@ import { Post, ApiResponse } from '../types/api';
 
 export const Module: React.FC = () => {
   const { moduleId } = useParams<{ moduleId: string }>();
+  const navigate = useNavigate();
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -116,7 +117,10 @@ export const Module: React.FC = () => {
                           fontWeight: 500,
                           mb: 1,
                           fontSize: 18,
+                          cursor: 'pointer',
+                          '&:hover': { textDecoration: 'underline' },
                         }}
+                        onClick={() => navigate(`/post/${post.post_id}`)}
                       >
                         {post.title}
                       </Typography>

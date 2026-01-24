@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Box,
   Card,
@@ -25,6 +26,7 @@ interface HomeProps {
 }
 
 export const Home: React.FC<HomeProps> = ({ openCreatePost, onCloseCreatePost }) => {
+  const navigate = useNavigate();
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -212,7 +214,10 @@ export const Home: React.FC<HomeProps> = ({ openCreatePost, onCloseCreatePost })
                       fontWeight: 500,
                       mb: 1,
                       fontSize: 18,
+                      cursor: 'pointer',
+                      '&:hover': { textDecoration: 'underline' },
                     }}
+                    onClick={() => navigate(`/post/${post.post_id}`)}
                   >
                     {post.title}
                   </Typography>

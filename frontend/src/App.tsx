@@ -5,6 +5,7 @@ import './App.css';
 import { Users } from './pages/Users';
 import { Home } from './pages/Home';
 import { Module } from './pages/Module';
+import { PostDetails } from './pages/PostDetails';
 
 export const App: React.FC = () => {
     const [openCreatePost, setOpenCreatePost] = useState(false);
@@ -25,6 +26,7 @@ export const App: React.FC = () => {
                             } 
                         />
                         <Route path="/module/:moduleId" element={<Module />} />
+                        <Route path="/post/:postId" element={<PostDetails />} />
                         <Route
                             path="/modules"
                             element={
