@@ -50,12 +50,12 @@ export const Home: React.FC<HomeProps> = ({ openCreatePost, onCloseCreatePost })
 
       {/* Posts Feed */}
       <Container maxWidth="md" sx={{ py: 3 }}>
-  <Stack spacing={2}>
-    {posts.map(post => (
-      <Postcard key={post.post_id} post={post} />
-    ))}
-  </Stack>
-</Container>
+        <Stack spacing={2}>
+          {posts.map(post => (
+            <Postcard key={post.post_id} post={post} />
+          ))}
+        </Stack>
+      </Container>
     </>
   );
 };
