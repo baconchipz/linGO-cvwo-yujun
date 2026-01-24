@@ -15,42 +15,36 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import { Post, ApiResponse } from '../types/api';
 
+export const PostDetail: React.FC = () => {
+  const { postId } = useParams<{ postId: string }>();
+  const navigate = useNavigate();
+  const [post, setPost] = useState<Post | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-export const PostDetails: React.FC = () => {
-    const { postId} = useParams<{ postId: string }>();
-    const navigate = useNavigate();
-    const [post, setPost] = useState<Post | null>(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
+  useEffect(() => {
+    // Fetch all posts and find the one we need
+    fetch('http://localhost:8080/posts')
+      .then(response => response.json())
+      .then((data: ApiResponse<Post[]>) => {
+        const foundPost = data.payload.data.find(
+          p => p.post_id === Number(postId)
+        );
+        if (foundPost) {
+          setPost(foundPost);
+        } else {
+          setError('Post not found');
+        }
+        setLoading(false);
+      })
+      .catch(err => {
+        setError(err.message);
+        setLoading(false);
+      });
+  }, [postId]);
 
-    useEffect(() => {
-        // fetch post details by postId using a dedicated endpoint
-        fetch(`http://localhost:8080/posts/${postId}`)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                return response.json();
-            })
-            .then((data: any) => {
-                const foundPost: Post | null =
-                    (data && data.payload && data.payload.data) ? data.payload.data as Post : data as Post;
-
-                if (foundPost) {
-                    setPost(foundPost);
-                } else {
-                    setError('Post not found');
-                }
-                setLoading(false);
-            })
-            .catch(err => {
-                setError(err.message);
-                setLoading(false);
-            });
-    }, [postId]);
-
-    if (loading) return <Box sx={{ p: 3 }}><Typography>Loading...</Typography></Box>;
-    if (error || !post) return <Box sx={{ p: 3 }}><Typography color="error">{error || 'Post not found'}</Typography></Box>;
+  if (loading) return <Box sx={{ p: 3 }}><Typography>Loading post...</Typography></Box>;
+  if (error || !post) return <Box sx={{ p: 3 }}><Typography color="error">{error || 'Post not found'}</Typography></Box>;
 
   return (
     <Container maxWidth="md" sx={{ py: 3 }}>
@@ -150,4 +144,4 @@ export const PostDetails: React.FC = () => {
       </Card>
     </Container>
   );
-}
+};
