@@ -1,28 +1,39 @@
 package posts
 
 import (
-    "encoding/json"
-    "fmt"
-    "net/http"
+	"encoding/json"
+	"fmt"
+	"net/http"
+	"strconv"
 
-    "modgo/internal/api"
-    "modgo/internal/dataaccess"
-    "modgo/internal/database"
-    "modgo/internal/models"
+	"modgo/internal/api"
+	"modgo/internal/dataaccess"
+	"modgo/internal/database"
+	"modgo/internal/models"
 
-    "github.com/pkg/errors"
+	"github.com/go-chi/chi/v5"
+	"github.com/pkg/errors"
 )
 
+//log identifiers
 const (
     ListPosts   = "posts.HandleList"
     CreatePost  = "posts.HandleCreate"
+    UpdatePost  = "posts.HandleUpdate"
+    DeletePost  = "posts.HandleDelete"
     
     SuccessfulListPostsMessage   = "Successfully listed posts"
     SuccessfulCreatePostMessage  = "Successfully created post"
+    SuccessfulUpdatePostMessage  = "Successfully updated post"
+    SuccessfulDeletePostMessage  = "Successfully deleted post"
     ErrRetrievePosts             = "Failed to retrieve posts in %s"
     ErrCreatePost                = "Failed to create post in %s"
+    ErrUpdatePost                = "Failed to update post in %s"
+    ErrDeletePost                = "Failed to delete post in %s"
     ErrDecodeRequest             = "Failed to decode request in %s"
     ErrEncodeView                = "Failed to encode posts in %s"
+    ErrInvalidPostID             = "Invalid post ID in %s"
+
 )
 
 func HandleList(w http.ResponseWriter, r *http.Request) (*api.Response, error) {
@@ -69,5 +80,61 @@ func HandleCreate(w http.ResponseWriter, r *http.Request) (*api.Response, error)
             Data: data,
         },
         Messages: []string{SuccessfulCreatePostMessage},
+    }, nil
+}
+
+func HandleUpdate(w http.ResponseWriter, r *http.Request) (*api.Response, error) {
+    db := database.GetDB()
+
+    // Get post ID from URL parameter
+    postIDStr := chi.URLParam(r, "postId")
+    postID, err := strconv.Atoi(postIDStr)
+    if err != nil {
+        return nil, errors.Wrap(err, fmt.Sprintf(ErrInvalidPostID, UpdatePost))
+    }
+
+    var post models.Post
+    if err := json.NewDecoder(r.Body).Decode(&post); err != nil {
+        return nil, errors.Wrap(err, fmt.Sprintf(ErrDecodeRequest, UpdatePost))
+    }
+
+    updatedPost, err := dataaccess.UpdatePost(db, postID, post)
+    if err != nil {
+        return nil, errors.Wrap(err, fmt.Sprintf(ErrUpdatePost, UpdatePost))
+    }
+
+    data, err := json.Marshal(updatedPost)
+    if err != nil {
+        return nil, errors.Wrap(err, fmt.Sprintf(ErrEncodeView, UpdatePost))
+    }
+
+    return &api.Response{
+        Payload: api.Payload{
+            Data: data,
+        },
+        Messages: []string{SuccessfulUpdatePostMessage},
+    }, nil
+}
+
+func HandleDelete(w http.ResponseWriter, r *http.Request) (*api.Response, error) {
+    db := database.GetDB()
+
+    // Get post ID from URL parameter
+    postIDStr := chi.URLParam(r, "postId")
+    postID, err := strconv.Atoi(postIDStr)
+    if err != nil {
+        return nil, errors.Wrap(err, fmt.Sprintf(ErrInvalidPostID, DeletePost))
+    }
+
+    err = dataaccess.DeletePost(db, postID)
+    if err != nil {
+        return nil, errors.Wrap(err, fmt.Sprintf(ErrDeletePost, DeletePost))
+    }
+
+    return &api.Response{
+        Payload: api.Payload{
+            Data: json.RawMessage(`{}`),
+        },
+        Messages: []string{SuccessfulDeletePostMessage},
     }, nil
 }

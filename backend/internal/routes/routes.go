@@ -54,6 +54,7 @@ func GetRoutes() func(r chi.Router) {
 			json.NewEncoder(w).Encode(response)
 		})
 
+		// Create post endpoint
 		r.Post("/posts", func(w http.ResponseWriter, req *http.Request) {
 			response, err := posts.HandleCreate(w, req)
 
@@ -80,6 +81,7 @@ func GetRoutes() func(r chi.Router) {
 			json.NewEncoder(w).Encode(response)
 		})
 
+		// Create comment endpoint
 		r.Post("/posts/{postId}/comments", func(w http.ResponseWriter, req *http.Request) {
 			response, err := comments.HandleCreate(w, req)
 
@@ -90,6 +92,33 @@ func GetRoutes() func(r chi.Router) {
 				return
 			}
 			w.WriteHeader(http.StatusCreated)
+			json.NewEncoder(w).Encode(response)
+		})
+
+		// Post modification endpoints
+		r.Put("/posts/{postId}", func(w http.ResponseWriter, req *http.Request) {
+			response, err := posts.HandleUpdate(w, req)
+
+			w.Header().Set("Content-Type", "application/json")
+			if err != nil {
+				w.WriteHeader(http.StatusBadRequest)
+				json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+				return
+			}
+			json.NewEncoder(w).Encode(response)
+		})
+
+		// Delete post endpoint
+		r.Delete("/posts/{postId}", func(w http.ResponseWriter, req *http.Request) {
+			response, err := posts.HandleDelete(w, req)
+
+			w.Header().Set("Content-Type", "application/json")
+			if err != nil {
+				w.WriteHeader(http.StatusInternalServerError)
+				json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+				return
+			}
+			w.WriteHeader(http.StatusNoContent)
 			json.NewEncoder(w).Encode(response)
 		})
 	}
