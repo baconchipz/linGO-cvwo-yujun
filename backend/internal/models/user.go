@@ -1,16 +1,11 @@
 package models
 
-import "fmt"
+import "time"
 
-//pascalcase formating for struct fields
 type User struct {
-	UserID int    `json:"id"`
-	Name   string `json:"name"`
-	Email  string `json:"email"`
-	Major  string `json:"major"`
-	Year   int    `json:"year"`
-}
-
-func (user *User) Greet() string {
-	return fmt.Sprintf("Hello, I am %s", user.Name)
+	UserID    int        `json:"user_id"`
+	Username  string     `json:"username"`
+	Password  string     `json:"-"` // Never send password in JSON
+	CreatedAt time.Time  `json:"created_at"`
+	DeletedAt *time.Time `json:"deleted_at,omitempty"`
 }
