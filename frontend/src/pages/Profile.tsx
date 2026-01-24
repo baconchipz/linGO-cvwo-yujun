@@ -10,6 +10,7 @@ import { Post, Comment, ApiResponse } from '../types/api';
 import { ProfilePostsTab } from '../components/ProfilePostsTab';
 import { ProfileCommentsTab } from '../components/ProfileCommentsTab';
 import { EditPostModal } from '../components/EditPostModal';
+import { DeleteConfirmDialog } from '../components/DeleteConfirmDialog';
 
 export const Profile: React.FC = () => {
   const [activeTab, setActiveTab] = useState(0);
@@ -17,7 +18,9 @@ export const Profile: React.FC = () => {
   const [comments, setComments] = useState<Comment[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingPost, setEditingPost] = useState<Post | null>(null);
-  
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [deletingPostId, setDeletingPostId] = useState<number | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
   // Mock user ID - replace with actual auth later
   const currentUserId = 1;
 
@@ -26,6 +29,7 @@ export const Profile: React.FC = () => {
     fetchUserComments();
   }, []);
 
+  // Fetch posts created by the current user
   const fetchUserPosts = () => {
     fetch('http://localhost:8080/posts')
       .then(response => response.json())
@@ -37,6 +41,7 @@ export const Profile: React.FC = () => {
       .catch(() => setLoading(false));
   };
 
+  // Fetch comments made by the current user
   const fetchUserComments = () => {
     fetch('http://localhost:8080/posts')
       .then(response => response.json())
@@ -55,22 +60,37 @@ export const Profile: React.FC = () => {
       })
       .catch(err => console.error('Failed to fetch comments:', err));
   };
-
+// Handle edit post action
   const handleEditPost = (post: Post) => {
     setEditingPost(post);
     console.log('Edit post:', post);
   };
+  // Handle delete post action
+    const handleDeletePost = async (postId: number) => {
+        setIsDeleting(true);
+        try {
+            const response = await fetch(`http://localhost:8080/posts/${postId}`, {
+            method: 'DELETE',
+            });
 
-  const handleDeletePost = (postId: number) => {
-    // TODO: Show confirmation and delete
-    console.log('Delete post:', postId);
-  };
-
+            if (response.ok) {
+            fetchUserPosts();
+            setDeletingPostId(null);
+            setDeleteConfirmOpen(false);
+            }
+        } catch (error) {
+            console.error('Failed to delete post:', error);
+        } finally {
+            setIsDeleting(false);
+        }
+    };
+// Handle edit comment action
   const handleEditComment = (comment: Comment) => {
     // TODO: Open edit modal or inline edit
     console.log('Edit comment:', comment);
   };
 
+  // Handle delete comment action
   const handleDeleteComment = (commentId: number) => {
     // TODO: Show confirmation and delete
     console.log('Delete comment:', commentId);
@@ -121,7 +141,7 @@ export const Profile: React.FC = () => {
         <ProfilePostsTab 
           posts={posts} 
           onEdit={handleEditPost} 
-          onDelete={handleDeletePost} 
+          onDelete={(postId) => setDeletingPostId(postId)} 
         />
       )}
       
@@ -140,6 +160,14 @@ export const Profile: React.FC = () => {
             fetchUserPosts();
             setEditingPost(null);
         }}
+        />
+        <DeleteConfirmDialog
+        open={deletingPostId !== null}
+        title="Delete Post"
+        message="Are you sure you want to delete this post? This action cannot be undone."
+        onConfirm={() => deletingPostId && handleDeletePost(deletingPostId)}
+        onCancel={() => setDeletingPostId(null)}
+        isDeleting={isDeleting}
         />
     </Container>
   );
