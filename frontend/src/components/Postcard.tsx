@@ -96,7 +96,7 @@ export const Postcard: React.FC<PostcardProps> = ({ post, showModule = true }) =
                 }}
                 onClick={() => navigate(`/post/${post.post_id}`)}
               >
-                Comment
+                {post.comment_count} {post.comment_count === 1 ? 'Comment' : 'Comments'}
               </Button>
             </Stack>
           </Box>
