@@ -1,5 +1,7 @@
 import React, {useEffect, useState} from "react";
-import { User, ApiResponse } from "../types/api";
+import { User } from "../types/api";
+import * as api from "../api/client";
+import { Box, Typography, Container, List, ListItem, ListItemText, CircularProgress } from '@mui/material';
 
 export const Users: React.FC = () => {
     const [users, setUsers] = useState<User[]>([]);
@@ -7,37 +9,42 @@ export const Users: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        fetch('http://localhost:8080/users')
-        .then(response => response.json())
-        .then((data: ApiResponse<User[]>) => {
-        setUsers(data.payload.data);
-        setLoading(false);
-      })
-      .catch(err => {
-        setError(err.message);
-        setLoading(false);
-      })
-    }, []); //runs only when component mounts
+        fetchUsers();
+    }, []);
+
+    const fetchUsers = async () => {
+        try {
+            const response = await api.listUsers();
+            setUsers(response.payload.data || []);
+            setLoading(false);
+        } catch (err) {
+            setError(err instanceof Error ? err.message : 'Failed to load users');
+            setLoading(false);
+        }
+    };
 
     if (loading) {
-        return <div>Loading...</div>;
+        return <Box sx={{ p: 3, display: 'flex', justifyContent: 'center' }}><CircularProgress /></Box>;
     }
 
     if (error) {
-        return <div>Error: {error}</div>;
+        return <Box sx={{ p: 3 }}><Typography color="error">Error: {error}</Typography></Box>;
     }
 
     return (
-        <div>
-            <h1>Users List</h1>
-            <ul>
-            {users.map(user => (
-                <li key={user.id}>
-                {user.id} - {user.name} - {user.major} - Year {user.year}
-                </li>
-            ))}
-            </ul>
-        </div>
+        <Container maxWidth="md" sx={{ py: 3 }}>
+            <Typography variant="h4" sx={{ mb: 3 }}>Users ({users.length})</Typography>
+            <List>
+                {users.map(user => (
+                    <ListItem key={user.user_id}>
+                        <ListItemText
+                            primary={user.username}
+                            secondary={`ID: ${user.user_id} | Joined: ${new Date(user.created_at).toLocaleDateString()}`}
+                        />
+                    </ListItem>
+                ))}
+            </List>
+        </Container>
     );
 }
 

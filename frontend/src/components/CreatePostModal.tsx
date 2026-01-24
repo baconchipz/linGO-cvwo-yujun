@@ -8,6 +8,7 @@ import {
   DialogContent,
   DialogActions,
 } from '@mui/material';
+import * as api from '../api/client';
 
 interface CreatePostModalProps {
   open: boolean;
@@ -22,31 +23,27 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({
 }) => {
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
+  const [moduleId, setModuleId] = useState('1');
   const [error, setError] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSubmitting(true);
+    setError(null);
 
-    const newPost = {
-      user_id: 1,
-      title,
-      body,
-      module_id: 'CS2030', // TODO: Make this selectable
-    };
-
-    fetch('http://localhost:8080/posts', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(newPost),
-    })
-      .then((response) => response.json())
-      .then(() => {
-        setTitle('');
-        setBody('');
-        onClose();
-        onPostCreated();
-      })
-      .catch((err) => setError(err.message));
+    try {
+      await api.createPost(1, title, body, parseInt(moduleId) || 1);
+      setTitle('');
+      setBody('');
+      setModuleId('1');
+      onClose();
+      onPostCreated();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to create post');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -89,6 +86,28 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({
           />
           <TextField
             fullWidth
+            select
+            label="Module"
+            value={moduleId}
+            onChange={(e) => setModuleId(e.target.value)}
+            SelectProps={{
+              native: true,
+            }}
+            sx={{
+              mb: 2,
+              '& .MuiInputBase-root': {
+                bgcolor: '#272729',
+                color: '#d7dadc',
+                borderRadius: 1,
+              },
+            }}
+          >
+            <option value="1">CS2030</option>
+            <option value="2">CS2040</option>
+            <option value="3">CS3230</option>
+          </TextField>
+          <TextField
+            fullWidth
             multiline
             rows={6}
             placeholder="What's on your mind?"
@@ -106,6 +125,11 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({
               },
             }}
           />
+          {error && (
+            <Box sx={{ color: '#ea4033', mt: 1, fontSize: '0.875rem' }}>
+              {error}
+            </Box>
+          )}
         </Box>
       </DialogContent>
       <DialogActions sx={{ p: 2, borderTop: '1px solid #343536' }}>
@@ -116,15 +140,17 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({
           type="submit"
           form="create-post-form"
           variant="contained"
+          disabled={submitting || !title || !body}
           sx={{
             bgcolor: '#0079d3',
             textTransform: 'none',
             fontWeight: 600,
             px: 3,
             '&:hover': { bgcolor: '#1484d6' },
+            '&:disabled': { bgcolor: '#818384', color: '#666' },
           }}
         >
-          Post
+          {submitting ? 'Posting...' : 'Post'}
         </Button>
       </DialogActions>
     </Dialog>

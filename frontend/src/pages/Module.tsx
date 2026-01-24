@@ -8,28 +8,38 @@ import {
   Stack,
   Container,
 } from '@mui/material';
-import { Post, ApiResponse } from '../types/api';
+import { Post } from '../types/api';
+import * as api from '../api/client';
 
 export const Module: React.FC = () => {
   const { moduleId } = useParams<{ moduleId: string }>();
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch('http://localhost:8080/posts')
-      .then(response => response.json())
-      .then((data: ApiResponse<Post[]>) => {
-        // Filter posts by module code (case-insensitive)
-        const modulePosts = data.payload.data.filter(
-          post => post.module_id.toUpperCase() === moduleId?.toUpperCase()
-        );
-        setPosts(modulePosts);
-        setLoading(false);
-      })
-      .catch(() => setLoading(false));
+    if (moduleId) {
+      fetchModulePosts();
+    }
   }, [moduleId]);
 
+  const fetchModulePosts = async () => {
+    try {
+      const response = await api.listPosts();
+      const moduleIdNum = parseInt(moduleId || '0');
+      const modulePosts = response.payload.data.filter(
+        post => post.module_id === moduleIdNum
+      );
+      setPosts(modulePosts);
+      setLoading(false);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load posts');
+      setLoading(false);
+    }
+  };
+
   if (loading) return <Box sx={{ p: 3 }}><Typography>Loading...</Typography></Box>;
+  if (error) return <Box sx={{ p: 3 }}><Typography color="error">Error: {error}</Typography></Box>;
 
   return (
     <>

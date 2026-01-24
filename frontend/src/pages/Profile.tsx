@@ -6,12 +6,13 @@ import {
   Tabs,
   Tab,
 } from '@mui/material';
-import { Post, Comment, ApiResponse } from '../types/api';
+import { Post, Comment } from '../types/api';
 import { ProfilePostsTab } from '../components/ProfilePostsTab';
 import { ProfileCommentsTab } from '../components/ProfileCommentsTab';
 import { EditPostModal } from '../components/EditPostModal';
 import { DeleteConfirmDialog } from '../components/DeleteConfirmDialog';
 import { EditCommentModal } from '../components/EditCommentModal';
+import * as api from '../api/client';
 
 export const Profile: React.FC = () => {
   const [activeTab, setActiveTab] = useState(0);
@@ -34,89 +35,92 @@ export const Profile: React.FC = () => {
   }, []);
 
   // Fetch posts created by the current user
-  const fetchUserPosts = () => {
-    fetch('http://localhost:8080/posts')
-      .then(response => response.json())
-      .then((data: ApiResponse<Post[]>) => {
-        const userPosts = data.payload.data.filter(post => post.user_id === currentUserId);
-        setPosts(userPosts);
-        setLoading(false);
-      })
-      .catch(() => setLoading(false));
+  const fetchUserPosts = async () => {
+    try {
+      const response = await api.listPosts();
+      const userPosts = response.payload.data.filter(post => post.user_id === currentUserId);
+      setPosts(userPosts);
+    } catch (err) {
+      console.error('Failed to fetch posts:', err);
+    }
   };
 
-  // Fetch comments made by the current user
-  const fetchUserComments = () => {
-    fetch('http://localhost:8080/posts')
-      .then(response => response.json())
-      .then((data: ApiResponse<Post[]>) => {
-        const allPosts = data.payload.data;
-        const commentPromises = allPosts.map(post =>
-          fetch(`http://localhost:8080/posts/${post.post_id}/comments`)
-            .then(res => res.json())
-        );
-        return Promise.all(commentPromises);
-      })
-      .then((commentsData: ApiResponse<Comment[]>[]) => {
-        const allComments = commentsData
-          .flatMap(data => data.payload.data)
-          .filter(comment => comment !== null && comment !== undefined);
-        const userComments = allComments.filter(comment => comment.user_id === currentUserId);
-        setComments(userComments);
-      })
-      .catch(err => console.error('Failed to fetch comments:', err));
+  // Fetch comments made by the current user - optimized with parallel requests
+  const fetchUserComments = async () => {
+    try {
+      const response = await api.listPosts();
+      const allPosts = response.payload.data;
+      
+      // Only fetch comments for posts that the current user created
+      const userPostIds = allPosts
+        .filter(post => post.user_id === currentUserId)
+        .map(post => post.post_id);
+      
+      if (userPostIds.length === 0) {
+        setComments([]);
+        setLoading(false);
+        return;
+      }
+      
+      // Fetch comments in parallel only for user's posts
+      const commentPromises = userPostIds.map(postId => api.listComments(postId));
+      const commentsData = await Promise.all(commentPromises);
+      const allComments = commentsData
+        .flatMap(data => data.payload.data || [])
+        .filter(comment => comment !== null && comment !== undefined);
+      
+      // Filter comments by current user
+      const userComments = allComments.filter(comment => comment.user_id === currentUserId);
+      setComments(userComments);
+    } catch (err) {
+      console.error('Failed to fetch comments:', err);
+    }
+    setLoading(false);
   };
-// Handle edit post action
+
+  // Handle edit post action
   const handleEditPost = (post: Post) => {
     setEditingPost(post);
     console.log('Edit post:', post);
   };
+
   // Handle delete post action
-    const handleDeletePost = async (postId: number) => {
-        setIsDeleting(true);
-        try {
-            const response = await fetch(`http://localhost:8080/posts/${postId}`, {
-            method: 'DELETE',
-            });
+  const handleDeletePost = async (postId: number) => {
+    setIsDeleting(true);
+    try {
+      await api.deletePost(postId);
+      fetchUserPosts();
+      setDeletingPostId(null);
+      setDeleteConfirmOpen(false);
+    } catch (error) {
+      console.error('Failed to delete post:', error);
+    } finally {
+      setIsDeleting(false);
+    }
+  };
 
-            if (response.ok) {
-            fetchUserPosts();
-            setDeletingPostId(null);
-            setDeleteConfirmOpen(false);
-            }
-        } catch (error) {
-            console.error('Failed to delete post:', error);
-        } finally {
-            setIsDeleting(false);
-        }
-    };
-    // Handle edit comment action
-    const handleEditComment = (comment: Comment) => {
-        setEditingComment(comment);
-        console.log('Edit comment:', comment);
-    };
+  // Handle edit comment action
+  const handleEditComment = (comment: Comment) => {
+    setEditingComment(comment);
+    console.log('Edit comment:', comment);
+  };
 
-    // Handle delete comment action
-    const handleDeleteComment = async (commentId: number) => {
+  // Handle delete comment action
+  const handleDeleteComment = async (commentId: number) => {
     setIsDeletingComment(true);
     const comment = comments.find(c => c.comment_id === commentId);
     if (!comment) return;
 
     try {
-        const response = await fetch(`http://localhost:8080/posts/${comment.post_id}/comments/${commentId}`, {
-        method: 'DELETE',
-        });
-
-        if (response.ok) {
-        fetchUserComments();
-        setDeletingCommentId(null);
-        }
+      await api.deleteComment(comment.post_id, commentId);
+      fetchUserComments();
+      setDeletingCommentId(null);
     } catch (error) {
-        console.error('Failed to delete comment:', error);
+      console.error('Failed to delete comment:', error);
     } finally {
-        setIsDeletingComment(false);
+      setIsDeletingComment(false);
     }
-    };
+  };
 
   if (loading) return <Box sx={{ p: 3 }}><Typography>Loading...</Typography></Box>;
 

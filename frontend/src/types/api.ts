@@ -1,8 +1,14 @@
 export interface User {
-    id: number;
-    name: string;
-    major: string;
-    year: number;
+    user_id: number;
+    username: string;
+    created_at: string;
+    deleted_at?: string | null;
+}
+
+export interface Module {
+    module_id: number;
+    module_title: string;
+    description: string;
 }
 
 export interface ApiResponse<T> {
@@ -18,9 +24,10 @@ export interface Post {
   user_id: number;
   title: string;
   body: string;
-  module_id: string;
+  module_id: number;
   created_at: string;
   updated_at: string;
+  deleted_at?: string | null;
   like_count: number;
   comment_count: number;
 }
@@ -32,6 +39,7 @@ export interface Comment {
     body: string;
     created_at: string;
     updated_at: string;
+    deleted_at?: string | null;
     like_count: number;
 }
 

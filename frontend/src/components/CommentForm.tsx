@@ -5,6 +5,7 @@ import {
   Button,
   Typography,           
 } from '@mui/material';
+import * as api from '../api/client';
 
 interface CommentFormProps {
     postId: number;
@@ -15,29 +16,20 @@ interface CommentFormProps {
 export const CommentForm: React.FC<CommentFormProps> = ({ postId, onCommentAdded }) => {
     const [body, setBody] = useState('');
     const [submitting, setSubmitting] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
     const handleSubmit = async () => {
         if (!body.trim()) return;
 
         setSubmitting(true);
-        try{
-            const response = await fetch(`http://localhost:8080/posts/${postId}/comments`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
-                    user_id: 1, // TODO: Replace with actual user ID
-                    body: body.trim(),
-                }),
-            });
-
-            if (response.ok) {
-                setBody('');
-                onCommentAdded();
-            } else {
-                console.error('Failed to submit comment');
-            }
-        } catch (error) {
-            console.error('Error submitting comment:', error);
+        setError(null);
+        try {
+            await api.createComment(postId, 1, body.trim());
+            setBody('');
+            onCommentAdded();
+        } catch (err) {
+            setError(err instanceof Error ? err.message : 'Failed to submit comment');
+            console.error('Error submitting comment:', err);
         } finally {
             setSubmitting(false);
         }
@@ -70,6 +62,11 @@ export const CommentForm: React.FC<CommentFormProps> = ({ postId, onCommentAdded
           },
         }}
       />
+      {error && (
+        <Box sx={{ color: '#ea4033', mt: 1, fontSize: '0.875rem' }}>
+          {error}
+        </Box>
+      )}
       <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 1 }}>
         <Button
           variant="contained"

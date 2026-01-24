@@ -7,7 +7,8 @@ import {
   Stack,
   Container,
 } from '@mui/material';
-import { Post, ApiResponse } from '../types/api';
+import { Post } from '../types/api';
+import * as api from '../api/client';
 
 interface HomeProps {
   openCreatePost: boolean;
@@ -23,17 +24,15 @@ export const Home: React.FC<HomeProps> = ({ openCreatePost, onCloseCreatePost })
     fetchPosts();
   }, []);
 
-  const fetchPosts = () => {
-    fetch('http://localhost:8080/posts')
-      .then(response => response.json())
-      .then((data: ApiResponse<Post[]>) => {
-        setPosts(data.payload.data);
-        setLoading(false);
-      })
-      .catch(err => {
-        setError(err.message);
-        setLoading(false);
-      });
+  const fetchPosts = async () => {
+    try {
+      const response = await api.listPosts();
+      setPosts(response.payload.data || []);
+      setLoading(false);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load posts');
+      setLoading(false);
+    }
   };
 
   if (loading) return <Box sx={{ p: 3 }}><Typography>Loading posts...</Typography></Box>;

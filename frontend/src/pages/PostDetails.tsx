@@ -13,9 +13,10 @@ import {
 } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
-import { Post, Comment, ApiResponse } from '../types/api';
+import { Post, Comment } from '../types/api';
 import { CommentList } from '../components/CommentList';
 import { CommentForm } from '../components/CommentForm';
+import * as api from '../api/client';
 
 export const PostDetail: React.FC = () => {
   const { postId } = useParams<{ postId: string }>();
@@ -25,37 +26,40 @@ export const PostDetail: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [comments, setComments] = useState<Comment[]>([]);
 
-  const fetchComments = () => {
+  const fetchComments = async () => {
     if (!postId) return;
-    fetch(`http://localhost:8080/posts/${postId}/comments`)
-        .then(response => response.json())
-        .then((data: ApiResponse<Comment[]>) => {
-            setComments(data.payload.data);
-        })
-        .catch(err => console.error('Failed to fetch comments:', err));
+    try {
+        const response = await api.listComments(parseInt(postId));
+        setComments(response.payload.data || []);
+    } catch (err) {
+        console.error('Failed to fetch comments:', err);
+    }
   };
 
   useEffect(() => {
-    // Fetch all posts and find the one we need
-    fetch('http://localhost:8080/posts')
-      .then(response => response.json())
-      .then((data: ApiResponse<Post[]>) => {
-        const foundPost = data.payload.data.find(
-          p => p.post_id === Number(postId)
-        );
-        if (foundPost) {
-          setPost(foundPost);
-          fetchComments();
-        } else {
-          setError('Post not found');
-        }
-        setLoading(false);
-      })
-      .catch(err => {
-        setError(err.message);
-        setLoading(false);
-      });
+    loadPostAndComments();
   }, [postId]);
+
+  const loadPostAndComments = async () => {
+    try {
+      const response = await api.listPosts();
+      const foundPost = response.payload.data.find(
+        p => p.post_id === Number(postId)
+      );
+      if (foundPost) {
+        setPost(foundPost);
+        if (postId) {
+          await fetchComments();
+        }
+      } else {
+        setError('Post not found');
+      }
+      setLoading(false);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load post');
+      setLoading(false);
+    }
+  };
 
   if (loading) return <Box sx={{ p: 3 }}><Typography>Loading post...</Typography></Box>;
   if (error || !post) return <Box sx={{ p: 3 }}><Typography color="error">{error || 'Post not found'}</Typography></Box>;
