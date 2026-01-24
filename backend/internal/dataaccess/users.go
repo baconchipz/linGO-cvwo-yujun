@@ -9,10 +9,11 @@ func ListUsers(db *database.Database) ([]models.User, error) {
 	// TODO: Replace with actual database query
 	users := []models.User{
 		{
-			User_ID:    1,
-			Name:  "CVWO Student",
-			Major: "Computer Science",
-			Year:  3,
+			UserID: 1,
+			Name:   "CVWO Student",
+			Email:  "student@nus.edu.sg",
+			Major:  "Computer Science",
+			Year:   3,
 		},
 	}
 	return users, nil
