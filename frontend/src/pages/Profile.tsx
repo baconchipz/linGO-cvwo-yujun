@@ -58,13 +58,10 @@ export const Profile: React.FC = () => {
         return Promise.all(commentPromises);
       })
       .then((commentsData: ApiResponse<Comment[]>[]) => {
-        console.log('All comments data:', commentsData);
         const allComments = commentsData
           .flatMap(data => data.payload.data)
           .filter(comment => comment !== null && comment !== undefined);
-        console.log('All comments flattened:', allComments);
         const userComments = allComments.filter(comment => comment.user_id === currentUserId);
-        console.log('User comments filtered:', userComments);
         setComments(userComments);
       })
       .catch(err => console.error('Failed to fetch comments:', err));
