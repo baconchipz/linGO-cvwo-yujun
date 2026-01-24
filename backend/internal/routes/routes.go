@@ -121,5 +121,32 @@ func GetRoutes() func(r chi.Router) {
 			w.WriteHeader(http.StatusNoContent)
 			json.NewEncoder(w).Encode(response)
 		})
+
+		// Comment modification endpoints
+		r.Put("/posts/{postId}/comments/{commentId}", func(w http.ResponseWriter, req *http.Request) {
+			response, err := comments.HandleUpdate(w, req)
+	
+			w.Header().Set("Content-Type", "application/json")
+			if err != nil {
+				w.WriteHeader(http.StatusBadRequest)
+				json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+				return
+			}
+			json.NewEncoder(w).Encode(response)
+		})
+		
+		// Delete comment endpoint
+		r.Delete("/posts/{postId}/comments/{commentId}", func(w http.ResponseWriter, req *http.Request) {
+			response, err := comments.HandleDelete(w, req)
+	
+			w.Header().Set("Content-Type", "application/json")
+			if err != nil {
+				w.WriteHeader(http.StatusInternalServerError)
+				json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+				return
+			}
+			w.WriteHeader(http.StatusNoContent)
+			json.NewEncoder(w).Encode(response)
+		})
 	}
 }

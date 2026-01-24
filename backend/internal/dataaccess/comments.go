@@ -1,6 +1,7 @@
 package dataaccess
 
 import (
+	"errors"
 	"modgo/internal/database"
 	"modgo/internal/models"
 	"time"
@@ -61,4 +62,36 @@ func CreateComment(db *database.Database, comment models.Comment) (models.Commen
 	}
 
 	return comment, nil
+}
+
+// UpdateComment updates an existing comment
+func UpdateComment(db *database.Database, commentID int, updatedComment models.Comment) (models.Comment, error) {
+    for i := range mockComments {
+        if mockComments[i].CommentID == commentID {
+            // Keep original values that shouldn't change
+            updatedComment.CommentID = mockComments[i].CommentID
+            updatedComment.PostID = mockComments[i].PostID
+            updatedComment.UserID = mockComments[i].UserID
+            updatedComment.CreatedAt = mockComments[i].CreatedAt
+            updatedComment.LikeCount = mockComments[i].LikeCount
+            updatedComment.UpdatedAt = time.Now()
+            
+            mockComments[i] = updatedComment
+            return mockComments[i], nil
+        }
+    }
+    return models.Comment{}, errors.New("comment not found")
+}
+
+// DeleteComment soft-deletes a comment by replacing its content
+func DeleteComment(db *database.Database, commentID int) error {
+    for i := range mockComments {
+        if mockComments[i].CommentID == commentID {
+            // Soft delete - replace body
+            mockComments[i].Body = "User has deleted this comment"
+            mockComments[i].UpdatedAt = time.Now()
+            return nil
+        }
+    }
+    return errors.New("comment not found")
 }
