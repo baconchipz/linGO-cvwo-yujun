@@ -13,7 +13,9 @@ import {
 } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
-import { Post, ApiResponse } from '../types/api';
+import { Post, Comment, ApiResponse } from '../types/api';
+import { CommentList } from '../components/CommentList';
+import { CommentForm } from '../components/CommentForm';
 
 export const PostDetail: React.FC = () => {
   const { postId } = useParams<{ postId: string }>();
@@ -21,6 +23,17 @@ export const PostDetail: React.FC = () => {
   const [post, setPost] = useState<Post | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [comments, setComments] = useState<Comment[]>([]);
+
+  const fetchComments = () => {
+    if (!postId) return;
+    fetch(`http://localhost:8080/posts/${postId}/comments`)
+        .then(response => response.json())
+        .then((data: ApiResponse<Comment[]>) => {
+            setComments(data.payload.data);
+        })
+        .catch(err => console.error('Failed to fetch comments:', err));
+  };
 
   useEffect(() => {
     // Fetch all posts and find the one we need
@@ -32,6 +45,7 @@ export const PostDetail: React.FC = () => {
         );
         if (foundPost) {
           setPost(foundPost);
+          fetchComments();
         } else {
           setError('Post not found');
         }
@@ -132,12 +146,9 @@ export const PostDetail: React.FC = () => {
 
               <Divider sx={{ bgcolor: '#343536', my: 2 }} />
 
-              {/* Comments Section Placeholder */}
-              <Box sx={{ mt: 3 }}>
-                <Typography sx={{ color: '#818384', fontStyle: 'italic' }}>
-                  Comments coming soon...
-                </Typography>
-              </Box>
+              {/* Comments Section */}
+                <CommentForm postId={post.post_id} onCommentAdded={fetchComments} />
+                <CommentList comments={comments} />
             </Box>
           </Box>
         </CardContent>
