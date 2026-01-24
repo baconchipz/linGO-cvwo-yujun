@@ -8,31 +8,31 @@ import (
 
 // Mock comments data
 var mockComments = []models.Comment{
-    {
-        CommentID: 1,
-        PostID:    1,
-        UserID:    1,
-        Body:      "Great post! I'm also taking this module.",
-        CreatedAt: time.Now().Add(-30 * time.Minute),
-        UpdatedAt: time.Now().Add(-30 * time.Minute),
-        LikeCount: 2,
-    },
-    {
-        CommentID: 2,
-        PostID:    1,
-        UserID:    1,
-        Body:      "Looking forward to the first lecture!",
-        CreatedAt: time.Now().Add(-15 * time.Minute),
-        UpdatedAt: time.Now().Add(-15 * time.Minute),
-        LikeCount: 1,
-    },
+	{
+		CommentID: 1,
+		PostID:    1,
+		UserID:    1,
+		Body:      "Great post! I'm also taking this module.",
+		CreatedAt: time.Now().Add(-30 * time.Minute),
+		UpdatedAt: time.Now().Add(-30 * time.Minute),
+		LikeCount: 2,
+	},
+	{
+		CommentID: 2,
+		PostID:    1,
+		UserID:    1,
+		Body:      "Looking forward to the first lecture!",
+		CreatedAt: time.Now().Add(-15 * time.Minute),
+		UpdatedAt: time.Now().Add(-15 * time.Minute),
+		LikeCount: 1,
+	},
 }
 
 // ListCommentsByPostID retrieves comments for a specific post
 func ListCommentsByPostID(db *database.Database, postID int) ([]models.Comment, error) {
 	// Filter comments by PostID
 	var postComments []models.Comment
-	// underscore is index of every element that we discarding	
+	// underscore is index of every element that we discarding
 	for _, comment := range mockComments {
 		if comment.PostID == postID {
 			postComments = append(postComments, comment)
@@ -51,6 +51,14 @@ func CreateComment(db *database.Database, comment models.Comment) (models.Commen
 
 	// Add to mock data
 	mockComments = append(mockComments, comment)
+
+	// Update the post's comment count
+	for i := range mockPosts {
+		if mockPosts[i].PostID == comment.PostID {
+			mockPosts[i].CommentCount++
+			break
+		}
+	}
 
 	return comment, nil
 }
