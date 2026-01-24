@@ -21,10 +21,9 @@ func Setup() chi.Router {
 		AllowCredentials: true,
 	}))
 
-	setUpRoutes(r)
+	r.Route("/api", routes.GetRoutes())
 	return r
 }
 
 func setUpRoutes(r chi.Router) {
-	r.Group(routes.GetRoutes())
 }
