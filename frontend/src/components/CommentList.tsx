@@ -8,7 +8,7 @@ interface CommentListProps {
 }
 
 export const CommentList: React.FC<CommentListProps> = ({ comments }) => {
-  if (comments.length === 0) {
+  if (!comments || comments.length === 0) {
     return (
       <Typography sx={{ color: '#818384', fontStyle: 'italic', mt: 3 }}>
         No comments yet. Be the first to comment!
