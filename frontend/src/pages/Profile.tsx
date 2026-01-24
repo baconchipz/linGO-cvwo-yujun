@@ -9,12 +9,14 @@ import {
 import { Post, Comment, ApiResponse } from '../types/api';
 import { ProfilePostsTab } from '../components/ProfilePostsTab';
 import { ProfileCommentsTab } from '../components/ProfileCommentsTab';
+import { EditPostModal } from '../components/EditPostModal';
 
 export const Profile: React.FC = () => {
   const [activeTab, setActiveTab] = useState(0);
   const [posts, setPosts] = useState<Post[]>([]);
   const [comments, setComments] = useState<Comment[]>([]);
   const [loading, setLoading] = useState(true);
+  const [editingPost, setEditingPost] = useState<Post | null>(null);
   
   // Mock user ID - replace with actual auth later
   const currentUserId = 1;
@@ -55,7 +57,7 @@ export const Profile: React.FC = () => {
   };
 
   const handleEditPost = (post: Post) => {
-    // TODO: Open edit modal
+    setEditingPost(post);
     console.log('Edit post:', post);
   };
 
@@ -130,6 +132,15 @@ export const Profile: React.FC = () => {
           onDelete={handleDeleteComment} 
         />
       )}
+      <EditPostModal
+        open={editingPost !== null}
+        post={editingPost}
+        onClose={() => setEditingPost(null)}
+        onPostUpdated={() => {
+            fetchUserPosts();
+            setEditingPost(null);
+        }}
+        />
     </Container>
   );
 };
