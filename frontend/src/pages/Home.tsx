@@ -1,23 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Postcard } from '../components/Postcard';
 import {
   Box,
-  Card,
-  CardContent,
   TextField,
-  Button,
   Typography,
-  IconButton,
   Stack,
-  Divider,
   Container,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
+  Button,
 } from '@mui/material';
-import ThumbUpIcon from '@mui/icons-material/ThumbUp';
-import CommentIcon from '@mui/icons-material/ChatBubbleOutline';
 import { Post, ApiResponse } from '../types/api';
 
 interface HomeProps {
@@ -26,7 +20,6 @@ interface HomeProps {
 }
 
 export const Home: React.FC<HomeProps> = ({ openCreatePost, onCloseCreatePost }) => {
-  const navigate = useNavigate();
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -86,10 +79,12 @@ export const Home: React.FC<HomeProps> = ({ openCreatePost, onCloseCreatePost })
         onClose={onCloseCreatePost}
         maxWidth="sm"
         fullWidth
-        PaperProps={{
-          sx: {
-            bgcolor: '#1a1a1b',
-            borderRadius: 2,
+        slotProps={{
+          paper: {
+            sx: {
+              bgcolor: '#1a1a1b',
+              borderRadius: 2,
+            }
           }
         }}
       >
@@ -161,94 +156,14 @@ export const Home: React.FC<HomeProps> = ({ openCreatePost, onCloseCreatePost })
         </DialogActions>
       </Dialog>
 
-      {/* Posts Feed */}
-      <Container maxWidth="md" sx={{ py: 3 }}>
-      {/* Posts Feed */}
-      <Stack spacing={2}>
-        {posts.map(post => (
-          <Card key={post.post_id} sx={{ bgcolor: '#1a1a1b', borderRadius: 2 }}>
-            <CardContent>
-              <Box sx={{ display: 'flex', gap: 2 }}>
-                {/* Vote Section */}
-                <Box
-                  sx={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    minWidth: 40,
-                  }}
-                >
-                  <IconButton size="small" sx={{ color: '#818384' }}>
-                    <ThumbUpIcon fontSize="small" />
-                  </IconButton>
-                  <Typography sx={{ color: '#d7dadc', fontWeight: 600, fontSize: 14 }}>
-                    {post.like_count}
-                  </Typography>
-                </Box>
-
-                {/* Content Section */}
-                <Box sx={{ flex: 1 }}>
-                  <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 0.5 }}>
-                    <Typography
-                      variant="caption"
-                      sx={{ 
-                        color: '#d7dadc',
-                        fontWeight: 600,
-                        fontSize: 13,
-                      }}
-                    >
-                      m/{post.module_id}
-                    </Typography>
-                    <Typography
-                      variant="caption"
-                      sx={{ color: '#818384' }}
-                    >
-                      • Posted by User {post.user_id} • {new Date(post.created_at).toLocaleDateString()}
-                    </Typography>
-                  </Stack>
-                  
-                  <Typography
-                    variant="h6"
-                    sx={{
-                      color: '#ff5722',
-                      fontWeight: 500,
-                      mb: 1,
-                      fontSize: 18,
-                      cursor: 'pointer',
-                      '&:hover': { textDecoration: 'underline' },
-                    }}
-                    onClick={() => navigate(`/post/${post.post_id}`)}
-                  >
-                    {post.title}
-                  </Typography>
-                  
-                  <Typography sx={{ color: '#d7dadc', mb: 2 }}>
-                    {post.body}
-                  </Typography>
-
-                  <Divider sx={{ bgcolor: '#343536', mb: 1 }} />
-
-                  {/* Action Buttons */}
-                  <Stack direction="row" spacing={1}>
-                    <Button
-                      startIcon={<CommentIcon />}
-                      size="small"
-                      sx={{
-                        color: '#818384',
-                        textTransform: 'none',
-                        '&:hover': { bgcolor: '#272729' },
-                      }}
-                    >
-                      Comment
-                    </Button>
-                  </Stack>
-                </Box>
-              </Box>
-            </CardContent>
-          </Card>
-        ))}
-      </Stack>
-    </Container>
+{/* Posts Feed */}
+<Container maxWidth="md" sx={{ py: 3 }}>
+  <Stack spacing={2}>
+    {posts.map(post => (
+      <Postcard key={post.post_id} post={post} />
+    ))}
+  </Stack>
+</Container>
     </>
   );
 };
