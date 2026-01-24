@@ -6,6 +6,7 @@ import { Users } from './pages/Users';
 import { Home } from './pages/Home';
 import { Module } from './pages/Module';
 import { PostDetail } from './pages/PostDetails';
+import { Profile } from './pages/Profile';
 
 export const App: React.FC = () => {
     const [openCreatePost, setOpenCreatePost] = useState(false);
@@ -38,12 +39,7 @@ export const App: React.FC = () => {
                         />
                         <Route
                             path="/profile"
-                            element={
-                                <div className="placeholder">
-                                    <h2>Profile</h2>
-                                    <p>Manage your profile, major, and year of study...</p>
-                                </div>
-                            }
+                            element={<Profile />}
                         />
                         <Route
                             path="/users"
