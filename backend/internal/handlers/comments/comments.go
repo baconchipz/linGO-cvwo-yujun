@@ -59,10 +59,20 @@ func HandleList(w http.ResponseWriter, r *http.Request) (*api.Response, error) {
 func HandleCreate(w http.ResponseWriter, r *http.Request) (*api.Response, error) {
     db := database.GetDB()
 
+    // Get post ID from URL parameter
+    postIDStr := chi.URLParam(r, "postId")
+    postID, err := strconv.Atoi(postIDStr)
+    if err != nil {
+        return nil, errors.Wrap(err, fmt.Sprintf(ErrInvalidPostID, CreateComment))
+    }
+
     var comment models.Comment
     if err := json.NewDecoder(r.Body).Decode(&comment); err != nil {
         return nil, errors.Wrap(err, fmt.Sprintf(ErrDecodeRequest, CreateComment))
     }
+
+    // Set the post ID from URL
+    comment.PostID = postID
 
     createdComment, err := dataaccess.CreateComment(db, comment)
     if err != nil {
