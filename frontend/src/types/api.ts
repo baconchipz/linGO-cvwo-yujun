@@ -24,5 +24,15 @@ export interface Post {
   like_count: number;
 }
 
+export interface Comment {
+    comment_id: number;
+    post_id: number;
+    user_id: number;
+    body: string;
+    created_at: string;
+    updated_at: string;
+    like_count: number;
+}
+
 //create a typescript interface, giving me autocomplete and type safety
 //when working with API responses that return a list of users
