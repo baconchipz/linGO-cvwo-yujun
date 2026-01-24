@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Header } from './components/Header';
+import { TestApiIntegration } from './components/TestApiIntegration';
 import './App.css';
 import { Users } from './pages/Users';
 import { Home } from './pages/Home';
@@ -26,6 +27,7 @@ export const App: React.FC = () => {
                                 />
                             } 
                         />
+                        <Route path="/test" element={<TestApiIntegration />} />
                         <Route path="/module/:moduleId" element={<Module />} />
                         <Route path="/post/:postId" element={<PostDetail />} />
                         <Route
