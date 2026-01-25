@@ -151,7 +151,16 @@ func HandleLike(w http.ResponseWriter, r *http.Request) (*api.Response, error) {
 		return nil, errors.Wrap(err, fmt.Sprintf(ErrInvalidPostID, LikePost))
 	}
 
-	likedPost, err := dataaccess.LikePost(db, postID)
+	// get user id from request body
+	var requestBody struct {
+		UserID int `json:"user_id"`
+	}
+	err = json.NewDecoder(r.Body).Decode(&requestBody)
+	if err != nil {
+		return nil, errors.Wrap(err, fmt.Sprintf(ErrDecodeRequest, LikePost))
+	}
+
+	likedPost, err := dataaccess.LikePost(db, postID, requestBody.UserID)
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf(ErrLikePost, LikePost))
 	}

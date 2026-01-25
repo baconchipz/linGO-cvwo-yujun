@@ -14,6 +14,7 @@ import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import CommentIcon from '@mui/icons-material/ChatBubbleOutline';
 import { Post } from '../types/api';
 import * as api from '../api/client';
+import { useUser } from '../context/UserContext';
 
 interface PostcardProps {
     post: Post;
@@ -22,15 +23,22 @@ interface PostcardProps {
 
 export const Postcard: React.FC<PostcardProps> = ({ post, showModule = true }) => {
     const navigate = useNavigate();
+    const { user } = useUser();
     const [likeCount, setLikeCount] = useState(post.like_count);
     const [isLiking, setIsLiking] = useState(false);
+    const [hasLiked, setHasLiked] = useState(false);
 
     const handleLike = async () => {
+      if (!user || hasLiked) {
+        console.log('Cannot like: user not logged in or already liked');
+        return;
+      }
       try {
         setIsLiking(true);
         console.log('Liking post:', post.post_id);
-        await api.likePost(post.post_id);
+        await api.likePost(post.post_id, user.user_id);
         setLikeCount(likeCount + 1);
+        setHasLiked(true);
       } catch (err) {
         console.log('Error liking post', err);
       } finally {
@@ -54,8 +62,14 @@ export const Postcard: React.FC<PostcardProps> = ({ post, showModule = true }) =
             <IconButton 
               size="small" 
               onClick={handleLike}
-              disabled={isLiking}
-              sx={{ color: '#818384', '&:hover': { color: '#ff6b35' } }}
+              disabled={isLiking || hasLiked}
+              sx={{ 
+                color: hasLiked ? '#ff6b35' : '#818384', 
+                '&:hover': { color: '#ff6b35' },
+                '&.Mui-disabled': {
+                  color: hasLiked ? '#ff6b35' : '#818384',
+                }
+              }}
             >
               <ThumbUpIcon fontSize="small" />
             </IconButton>

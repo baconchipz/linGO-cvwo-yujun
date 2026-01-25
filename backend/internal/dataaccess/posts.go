@@ -102,10 +102,34 @@ func DeletePost(db *database.Database, postID int) error {
 }
 
 // Increment like count for a post
-func LikePost(db *database.Database, postID int) (models.Post, error) {
+func LikePost(db *database.Database, postID int, userID int) (models.Post, error) {
+	// check if user already liked this post
+	var exists bool
+	err := db.QueryRow(`
+		SELECT EXISTS(SELECT 1 FROM user_post_likes WHERE user_id = $1 AND post_id = $2)`,
+		userID, postID,
+	).Scan(&exists)
+	if err != nil {
+		return models.Post{}, err
+	}
+	if exists {
+		return models.Post{}, errors.New("user already liked this post")
+	}
+
+	// insert into user_post_likes
+	_, err = db.Exec(`
+		INSERT INTO user_post_likes (user_id, post_id)
+		VALUES ($1, $2)`,
+		userID, postID,
+	)
+	if err != nil {
+		return models.Post{}, err
+	}
+
+	// increment like count
 	var post models.Post
 	var deletedAt sql.NullTime
-	err := db.QueryRow(`
+	err = db.QueryRow(`
 		UPDATE posts
 		SET like_count = like_count + 1
 		WHERE post_id = $1 AND deleted_at IS NULL
