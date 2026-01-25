@@ -59,7 +59,7 @@ export const Postcard: React.FC<PostcardProps> = ({ post, showModule = true }) =
                 </Typography>
               )}
               <Typography variant="caption" sx={{ color: '#818384' }}>
-                {showModule && '•'} Posted by User {post.user_id} • {new Date(post.created_at).toLocaleDateString()}
+                {showModule && '•'} Posted by {post.username || `User ${post.user_id}`} • {new Date(post.created_at).toLocaleDateString()}
               </Typography>
             </Stack>
 

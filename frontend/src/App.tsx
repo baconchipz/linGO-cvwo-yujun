@@ -8,6 +8,7 @@ import { Home } from './pages/Home';
 import { Module } from './pages/Module';
 import { PostDetail } from './pages/PostDetails';
 import { Profile } from './pages/Profile';
+import { ModuleSelection } from './pages/ModuleSelection';
 import { UserProvider, useUser } from './context/UserContext';
 import { LoginModal } from './components/LoginModal';
 
@@ -32,15 +33,7 @@ const Shell: React.FC = () => {
           <Route path="/test" element={<TestApiIntegration />} />
           <Route path="/module/:moduleId" element={<Module />} />
           <Route path="/post/:postId" element={<PostDetail />} />
-          <Route
-            path="/modules"
-            element={
-              <div className="placeholder">
-                <h2>My Modules</h2>
-                <p>Your personalized modules will appear here...</p>
-              </div>
-            }
-          />
+          <Route path="/modules" element={<ModuleSelection />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/users" element={<Users />} />
           <Route

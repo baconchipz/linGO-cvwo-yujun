@@ -50,7 +50,7 @@ export const ProfilePostsTab: React.FC<ProfilePostsTabProps> = ({ posts, onEdit,
               {/* Content */}
               <Box sx={{ flex: 1 }}>
                 <Typography variant="caption" sx={{ color: '#818384', mb: 0.5 }}>
-                  m/{post.module_code} • {new Date(post.created_at).toLocaleDateString()}
+                  m/{post.module_code} • Posted by {post.username || `User ${post.user_id}`} • {new Date(post.created_at).toLocaleDateString()}
                 </Typography>
                 <Typography
                   variant="h6"

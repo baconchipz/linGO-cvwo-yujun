@@ -46,7 +46,7 @@ export const CommentList: React.FC<CommentListProps> = ({ comments }) => {
               <Box sx={{ flex: 1 }}>
                 <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 0.5 }}> 
                   <Typography variant="caption" sx={{ color: '#818384', fontWeight: 600 }}>
-                    User {comment.user_id}
+                    {comment.username || `User ${comment.user_id}`}
                   </Typography>
                   <Typography variant="caption" sx={{ color: '#818384' }}>
                     • {new Date(comment.created_at).toLocaleDateString()}

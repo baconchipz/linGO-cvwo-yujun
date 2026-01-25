@@ -9,6 +9,7 @@ import (
 type Post struct {
 	PostID       int        `json:"post_id"`
 	UserID       int        `json:"user_id"`
+	Username     string     `json:"username,omitempty"`
 	Title        string     `json:"title"`
 	Body         string     `json:"body"`
 	ModuleID     uuid.UUID  `json:"module_id"`

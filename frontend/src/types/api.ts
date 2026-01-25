@@ -23,6 +23,7 @@ export interface ApiResponse<T> {
 export interface Post {
   post_id: number;
   user_id: number;
+  username?: string;
   title: string;
   body: string;
   module_id: string;
@@ -38,6 +39,7 @@ export interface Comment {
     comment_id: number;
     post_id: number;
     user_id: number;
+    username?: string;
     body: string;
     created_at: string;
     updated_at: string;

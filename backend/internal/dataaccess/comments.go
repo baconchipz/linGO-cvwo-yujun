@@ -11,10 +11,11 @@ import (
 // ListCommentsByPostID retrieves comments for a specific post (non-deleted)
 func ListCommentsByPostID(db *database.Database, postID int) ([]models.Comment, error) {
 	rows, err := db.Query(`
-		SELECT comment_id, post_id, user_id, body, created_at, updated_at, deleted_at, like_count
-		FROM comments
-		WHERE post_id = $1 AND deleted_at IS NULL
-		ORDER BY created_at`, postID)
+		SELECT c.comment_id, c.post_id, c.user_id, u.username, c.body, c.created_at, c.updated_at, c.deleted_at, c.like_count
+		FROM comments c
+		LEFT JOIN users u ON c.user_id = u.user_id
+		WHERE c.post_id = $1 AND c.deleted_at IS NULL
+		ORDER BY c.created_at`, postID)
 	if err != nil {
 		return nil, err
 	}
@@ -25,7 +26,7 @@ func ListCommentsByPostID(db *database.Database, postID int) ([]models.Comment, 
 		var c models.Comment
 		var deletedAt sql.NullTime
 		if err := rows.Scan(
-			&c.CommentID, &c.PostID, &c.UserID, &c.Body,
+			&c.CommentID, &c.PostID, &c.UserID, &c.Username, &c.Body,
 			&c.CreatedAt, &c.UpdatedAt, &deletedAt, &c.LikeCount,
 		); err != nil {
 			return nil, err

@@ -12,11 +12,12 @@ import (
 func ListPosts(db *database.Database) ([]models.Post, error) {
 	// query posts and join with modules to get module_code
 	rows, err := db.Query(`
-        SELECT p.post_id, p.user_id, p.title, p.body, p.module_id,
+        SELECT p.post_id, p.user_id, u.username, p.title, p.body, p.module_id,
                m.module_code,
                p.created_at, p.updated_at, p.deleted_at, p.like_count, p.comment_count
         FROM posts p
         LEFT JOIN modules m ON p.module_id = m.module_id
+        LEFT JOIN users u ON p.user_id = u.user_id
         WHERE p.deleted_at IS NULL
         ORDER BY p.created_at DESC`)
 	if err != nil {
@@ -29,7 +30,7 @@ func ListPosts(db *database.Database) ([]models.Post, error) {
 		var p models.Post
 		var deletedAt sql.NullTime
 		if err := rows.Scan(
-			&p.PostID, &p.UserID, &p.Title, &p.Body, &p.ModuleID,
+			&p.PostID, &p.UserID, &p.Username, &p.Title, &p.Body, &p.ModuleID,
 			&p.ModuleCode,
 			&p.CreatedAt, &p.UpdatedAt, &deletedAt, &p.LikeCount, &p.CommentCount,
 		); err != nil {

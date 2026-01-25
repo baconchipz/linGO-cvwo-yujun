@@ -6,6 +6,7 @@ type Comment struct {
 	CommentID int        `json:"comment_id"`
 	PostID    int        `json:"post_id"`
 	UserID    int        `json:"user_id"`
+	Username  string     `json:"username,omitempty"`
 	Body      string     `json:"body"`
 	CreatedAt time.Time  `json:"created_at"`
 	UpdatedAt time.Time  `json:"updated_at"`
