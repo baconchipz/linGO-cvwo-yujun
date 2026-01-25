@@ -9,9 +9,11 @@ import (
     "github.com/go-chi/chi/v5"
     "github.com/go-chi/cors"
 
-    "modgo/backend/internal/database"
-    "modgo/backend/internal/routes"
+
+    "modgo/internal/database"
+    "modgo/internal/routes"
 )
+
 
 func main() {
     // DB config from environment (with local fallbacks)
@@ -51,7 +53,7 @@ func main() {
     log.Fatalln(http.ListenAndServe(":"+port, r))
 }
 
-// getenv returns env var or fallback
+// getenv returns env var or fall
 func getenv(key, fallback string) string {
     if v := os.Getenv(key); v != "" {
         return v
