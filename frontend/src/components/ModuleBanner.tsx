@@ -2,11 +2,11 @@ import React from 'react';
 import { Box, Typography, Container, Avatar } from '@mui/material';
 
 interface ModuleBannerProps {
-  moduleId: string;
+  moduleCode: string;
   postCount: number;
 }
 
-export const ModuleBanner: React.FC<ModuleBannerProps> = ({ moduleId, postCount }) => {
+export const ModuleBanner: React.FC<ModuleBannerProps> = ({ moduleCode, postCount }) => {
   return (
     <Box
       sx={{
@@ -25,11 +25,11 @@ export const ModuleBanner: React.FC<ModuleBannerProps> = ({ moduleId, postCount 
               fontWeight: 700,
             }}
           >
-            {moduleId?.replace(/\d+/g, '') || 'M'}
+            {moduleCode?.replace(/\d+/g, '') || 'M'}
           </Avatar>
           <Box>
             <Typography variant="h4" sx={{ color: '#d7dadc', fontWeight: 700, mb: 0.5 }}>
-              m/{moduleId}
+              m/{moduleCode}
             </Typography>
             <Typography sx={{ color: '#818384' }}>
               Module • {postCount} posts

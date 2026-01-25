@@ -12,6 +12,7 @@ import {
   InputAdornment,
 } from '@mui/material';
 import { useUser } from '../context/UserContext';
+import * as api from '../api/client';
 
 interface HeaderProps {
   onPostClick?: () => void;
@@ -23,17 +24,20 @@ export const Header: React.FC<HeaderProps> = ({ onPostClick }) => {
   const { user, logout } = useUser();
 
   // handle search submit
-  const handleSearch = (e: React.FormEvent) => {
+  const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
       const moduleMatch = searchQuery.match(/[a-zA-Z]*\d+/);
       if (moduleMatch) {
         const moduleCode = moduleMatch[0].toUpperCase();
-        let asciiSum = 0;
-        for (let i = 0; i < moduleCode.length; i++) {
-          asciiSum += moduleCode.charCodeAt(i);
+        try {
+          const response = await api.getModuleByCode(moduleCode);
+          if (response.payload.data) {
+            navigate(`/module/${response.payload.data.module_id}`);
+          }
+        } catch (error) {
+          console.error('Module not found', error);
         }
-        navigate(`/module/${asciiSum}`);
       } else {
         navigate(`/search?q=${encodeURIComponent(searchQuery)}`);
       }

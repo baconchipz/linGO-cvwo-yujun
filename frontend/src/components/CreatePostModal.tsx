@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   TextField,
@@ -10,6 +10,7 @@ import {
 } from '@mui/material';
 import * as api from '../api/client';
 import { useUser } from '../context/UserContext';
+import { Module } from '../types/api';
 
 interface CreatePostModalProps {
   open: boolean;
@@ -25,9 +26,29 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({
   const { user } = useUser();
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
-  const [moduleId, setModuleId] = useState('1');
+  const [modules, setModules] = useState<Module[]>([]);
+  const [moduleId, setModuleId] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    const fetchModules = async () => {
+      try {
+        const response = await api.listModules();
+        if (response.payload.data) {
+          setModules(response.payload.data);
+          if (response.payload.data.length > 0) {
+            setModuleId(response.payload.data[0].module_id);
+          }
+        }
+      } catch (err) {
+        console.error('Failed to fetch modules', err);
+      }
+    };
+    if (open) {
+      fetchModules();
+    }
+  }, [open]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,10 +60,9 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({
     setError(null);
 
     try {
-      await api.createPost(user.user_id, title, body, parseInt(moduleId) || 1);
+      await api.createPost(user.user_id, title, body, moduleId);
       setTitle('');
       setBody('');
-      setModuleId('1');
       onClose();
       onPostCreated();
     } catch (err) {
@@ -111,9 +131,11 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({
               },
             }}
           >
-            <option value="1">CS2030</option>
-            <option value="2">CS2040</option>
-            <option value="3">CS3230</option>
+            {modules.map((module) => (
+              <option key={module.module_id} value={module.module_id}>
+                {module.module_code}
+              </option>
+            ))}
           </TextField>
           <TextField
             fullWidth

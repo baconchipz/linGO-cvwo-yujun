@@ -1,22 +1,23 @@
 export interface User {
-    user_id: number;
-    username: string;
-    created_at: string;
-    deleted_at?: string | null;
+  user_id: number;
+  username: string;
+  created_at: string;
+  deleted_at?: string | null;
 }
 
 export interface Module {
-    module_id: number;
-    module_title: string;
-    description: string;
+  module_id: string;
+  module_code: string;
+  module_title: string;
+  description: string;
 }
 
 export interface ApiResponse<T> {
-    payload: {
-        data: T;
-    }
-    messages: string[];
-    errorCode: number;
+  payload: {
+    data: T;
+  }
+  messages: string[];
+  errorCode: number;
 }
 
 export interface Post {
@@ -24,7 +25,8 @@ export interface Post {
   user_id: number;
   title: string;
   body: string;
-  module_id: number;
+  module_id: string;
+  module_code?: string;
   created_at: string;
   updated_at: string;
   deleted_at?: string | null;

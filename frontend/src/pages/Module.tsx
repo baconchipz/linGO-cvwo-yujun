@@ -8,12 +8,13 @@ import {
   Stack,
   Container,
 } from '@mui/material';
-import { Post } from '../types/api';
+import { Post, Module as ModuleType } from '../types/api';
 import * as api from '../api/client';
 
 export const Module: React.FC = () => {
   const { moduleId } = useParams<{ moduleId: string }>();
   const [posts, setPosts] = useState<Post[]>([]);
+  const [module, setModule] = useState<ModuleType | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -25,12 +26,16 @@ export const Module: React.FC = () => {
 
   const fetchModulePosts = async () => {
     try {
-      const response = await api.listPosts();
-      const moduleIdNum = parseInt(moduleId || '0');
-      const modulePosts = response.payload.data.filter(
-        post => post.module_id === moduleIdNum
+      const [postsResponse, moduleResponse] = await Promise.all([
+        api.listPosts(),
+        api.getModule(moduleId!)
+      ]);
+      
+      const modulePosts = postsResponse.payload.data.filter(
+        post => post.module_id === moduleId
       );
       setPosts(modulePosts);
+      setModule(moduleResponse.payload.data);
       setLoading(false);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load posts');
@@ -43,7 +48,7 @@ export const Module: React.FC = () => {
 
   return (
     <>
-      <ModuleBanner moduleId={moduleId || ''} postCount={posts.length} />
+      <ModuleBanner moduleCode={module?.module_code || moduleId || ''} postCount={posts.length} />
 
       {/* Posts Feed */}
       <Container maxWidth="md" sx={{ py: 3 }}>

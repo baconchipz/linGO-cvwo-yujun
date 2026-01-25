@@ -45,8 +45,13 @@ export async function listModules() {
   return res.json() as Promise<ApiResponse<any[]>>;
 }
 
-export async function getModule(moduleId: number) {
+export async function getModule(moduleId: string) {
   const res = await fetch(`${API_BASE_URL}/modules/${moduleId}`);
+  return res.json() as Promise<ApiResponse<any>>;
+}
+
+export async function getModuleByCode(moduleCode: string) {
+  const res = await fetch(`${API_BASE_URL}/modules/code/${moduleCode}`);
   return res.json() as Promise<ApiResponse<any>>;
 }
 
@@ -55,14 +60,14 @@ export async function getUserModules(userId: number) {
   return res.json() as Promise<ApiResponse<any[]>>;
 }
 
-export async function subscribeToModule(userId: number, moduleId: number) {
+export async function subscribeToModule(userId: number, moduleId: string) {
   const res = await fetch(`${API_BASE_URL}/users/${userId}/modules/${moduleId}`, {
     method: 'POST',
   });
   return res.json() as Promise<ApiResponse<any>>;
 }
 
-export async function unsubscribeFromModule(userId: number, moduleId: number) {
+export async function unsubscribeFromModule(userId: number, moduleId: string) {
   const res = await fetch(`${API_BASE_URL}/users/${userId}/modules/${moduleId}`, {
     method: 'DELETE',
   });
@@ -75,7 +80,7 @@ export async function listPosts() {
   return res.json() as Promise<ApiResponse<any[]>>;
 }
 
-export async function createPost(userId: number, title: string, body: string, moduleId: number) {
+export async function createPost(userId: number, title: string, body: string, moduleId: string) {
   const res = await fetch(`${API_BASE_URL}/posts`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
