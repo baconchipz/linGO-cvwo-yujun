@@ -32,7 +32,7 @@ func main() {
 
     // CORS
     r.Use(cors.Handler(cors.Options{
-        AllowedOrigins:   []string{"https://your-netlify-site.netlify.app"},
+        AllowedOrigins:   []string{"https://modgo-yujun.netlify.app"},
         AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
         AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type"},
         AllowCredentials: true,
