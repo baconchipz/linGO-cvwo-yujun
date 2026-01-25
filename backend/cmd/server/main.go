@@ -9,11 +9,9 @@ import (
     "github.com/go-chi/chi/v5"
     "github.com/go-chi/cors"
 
-
     "modgo/internal/database"
     "modgo/internal/routes"
 )
-
 
 func main() {
     // DB config from environment (with local fallbacks)
@@ -32,7 +30,7 @@ func main() {
 
     r := chi.NewRouter()
 
-    // CORS: replace with your actual Netlify domain when you have it
+    // CORS
     r.Use(cors.Handler(cors.Options{
         AllowedOrigins:   []string{"https://your-netlify-site.netlify.app"},
         AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
@@ -41,7 +39,8 @@ func main() {
         MaxAge:           300,
     }))
 
-    routes.Setup(r)
+    // Register routes
+    routes.GetRoutes()(r)
 
     // Respect PORT from environment (Render/Heroku/etc.), default to 8080 locally
     port := os.Getenv("PORT")
@@ -53,7 +52,7 @@ func main() {
     log.Fatalln(http.ListenAndServe(":"+port, r))
 }
 
-// getenv returns env var or fall
+// getenv returns env var or fallback
 func getenv(key, fallback string) string {
     if v := os.Getenv(key); v != "" {
         return v
