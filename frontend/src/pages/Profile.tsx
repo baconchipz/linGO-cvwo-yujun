@@ -22,7 +22,7 @@ export const Profile: React.FC = () => {
   const [comments, setComments] = useState<Comment[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingPost, setEditingPost] = useState<Post | null>(null);
-  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [, setDeleteConfirmOpen] = useState(false);
   const [deletingPostId, setDeletingPostId] = useState<number | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [editingComment, setEditingComment] = useState<Comment | null>(null);
@@ -190,7 +190,7 @@ export const Profile: React.FC = () => {
         post={editingPost}
         onClose={() => setEditingPost(null)}
         onPostUpdated={() => {
-            fetchUserPosts();
+            if (currentUserId) fetchUserPosts(currentUserId);
             setEditingPost(null);
         }}
         />
@@ -208,7 +208,7 @@ export const Profile: React.FC = () => {
         comment={editingComment}
         onClose={() => setEditingComment(null)}
         onCommentUpdated={() => {
-        fetchUserComments();
+        if (currentUserId) fetchUserComments(currentUserId);
         setEditingComment(null);
         }}
         />  
