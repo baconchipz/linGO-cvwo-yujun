@@ -1,4 +1,3 @@
-// filepath: backend/cmd/server/main.go
 package main
 
 import (
@@ -9,8 +8,8 @@ import (
 
     "github.com/gin-contrib/cors"
 
-    "modgo/internal/database"
-    "modgo/internal/router"
+    "modgo/backend/internal/database"
+    "modgo/backend/internal/router"
 )
 
 func main() {
