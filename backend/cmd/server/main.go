@@ -6,10 +6,11 @@ import (
     "net/http"
     "os"
 
-    "github.com/gin-contrib/cors"
+    "github.com/go-chi/chi/v5"
+    "github.com/go-chi/cors"
 
     "modgo/backend/internal/database"
-    "modgo/backend/internal/router"
+    "modgo/backend/internal/routes"
 )
 
 func main() {
@@ -27,15 +28,18 @@ func main() {
     }
     fmt.Println("Connected to database successfully!")
 
-    r := router.Setup()
+    r := chi.NewRouter()
 
     // CORS: replace with your actual Netlify domain when you have it
-    corsCfg := cors.DefaultConfig()
-    corsCfg.AllowOrigins = []string{"https://your-netlify-site.netlify.app"}
-    corsCfg.AllowMethods = []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"}
-    corsCfg.AllowHeaders = []string{"Origin", "Content-Type", "Authorization"}
-    corsCfg.AllowCredentials = true
-    r.Use(cors.New(corsCfg))
+    r.Use(cors.Handler(cors.Options{
+        AllowedOrigins:   []string{"https://your-netlify-site.netlify.app"},
+        AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+        AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type"},
+        AllowCredentials: true,
+        MaxAge:           300,
+    }))
+
+    routes.Setup(r)
 
     // Respect PORT from environment (Render/Heroku/etc.), default to 8080 locally
     port := os.Getenv("PORT")
