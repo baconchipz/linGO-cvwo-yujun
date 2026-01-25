@@ -146,7 +146,7 @@ export const Profile: React.FC = () => {
       {/* Tabs */}
       <Tabs
         value={activeTab}
-        onChange={(e, newValue) => setActiveTab(newValue)}
+        onChange={(_, newValue) => setActiveTab(newValue)}
         sx={{
           borderBottom: 1,
           borderColor: '#343536',
@@ -191,7 +191,7 @@ export const Profile: React.FC = () => {
         onClose={() => setEditingPost(null)}
         onPostUpdated={() => {
             if (currentUserId) fetchUserPosts(currentUserId);
-            setEditingPost(null);
+            setDeleteConfirmOpen(false);
         }}
         />
         <DeleteConfirmDialog
@@ -209,7 +209,7 @@ export const Profile: React.FC = () => {
         onClose={() => setEditingComment(null)}
         onCommentUpdated={() => {
         if (currentUserId) fetchUserComments(currentUserId);
-        setEditingComment(null);
+        setDeleteConfirmOpen(false);
         }}
         />  
 

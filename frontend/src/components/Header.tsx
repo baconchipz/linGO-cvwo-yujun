@@ -92,7 +92,7 @@ export const Header: React.FC<HeaderProps> = ({ onPostClick }) => {
                   }}
                 />
                 <Typography variant="h6" fontWeight={700} color="#dce8ff">
-                  linGO
+                  modGO
                 </Typography>
               </Box>
 
