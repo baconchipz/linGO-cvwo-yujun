@@ -26,18 +26,21 @@ export const Module: React.FC = () => {
 
   const fetchModulePosts = async () => {
     try {
-      const [postsResponse, moduleResponse] = await Promise.all([
-        api.listPosts(),
-        api.getModule(moduleId!)
-      ]);
+      console.log('Loading module posts for:', moduleId);
+      // get posts and module info
+      const postsRes = await api.listPosts();
+      const moduleRes = await api.getModule(moduleId!);
       
-      const modulePosts = postsResponse.payload.data.filter(
+      // filter posts for this module
+      const filtered = postsRes.payload.data.filter(
         post => post.module_id === moduleId
       );
-      setPosts(modulePosts);
-      setModule(moduleResponse.payload.data);
+      console.log('Found posts:', filtered.length);
+      setPosts(filtered);
+      setModule(moduleRes.payload.data);
       setLoading(false);
     } catch (err) {
+      console.log('Error:', err);
       setError(err instanceof Error ? err.message : 'Failed to load posts');
       setLoading(false);
     }

@@ -23,17 +23,25 @@ export const LoginModal: React.FC<Props> = ({ open }) => {
     setLoading(true);
     setError(null);
     try {
+      console.log('Logging in as:', name);
+      // get all users
       const all = await api.listUsers();
-      const match = (all.payload.data || []).find((u: User) => u.username.toLowerCase() === name.toLowerCase());
-      let result: User;
-      if (match) {
-        result = match;
+      const users = all.payload.data || [];
+      // check if user exists
+      const existingUser = users.find((u: User) => u.username.toLowerCase() === name.toLowerCase());
+      let user: User;
+      if (existingUser) {
+        console.log('User found');
+        user = existingUser;
       } else {
+        // create new user
+        console.log('Creating new user');
         const created = await api.createUser(name, '');
-        result = created.payload.data as User;
+        user = created.payload.data as User;
       }
-      setUser(result);
+      setUser(user);
     } catch (err) {
+      console.log('Login error:', err);
       setError(err instanceof Error ? err.message : 'Something went wrong');
     } finally {
       setLoading(false);

@@ -26,10 +26,13 @@ export const Home: React.FC<HomeProps> = ({ openCreatePost, onCloseCreatePost })
 
   const fetchPosts = async () => {
     try {
+      console.log('Fetching posts...');
       const response = await api.listPosts();
+      console.log('Got posts:', response.payload.data);
       setPosts(response.payload.data || []);
       setLoading(false);
     } catch (err) {
+      console.log('Error loading posts:', err);
       setError(err instanceof Error ? err.message : 'Failed to load posts');
       setLoading(false);
     }

@@ -37,14 +37,17 @@ export const Profile: React.FC = () => {
     }
   }, [currentUserId]);
 
-  // Fetch posts created by the current user
+  // get user's posts
   const fetchUserPosts = async (uid: number) => {
     try {
+      console.log('Getting posts for user:', uid);
       const response = await api.listPosts();
-      const userPosts = response.payload.data.filter(post => post.user_id === uid);
-      setPosts(userPosts);
+      // filter posts by user id
+      const myPosts = response.payload.data.filter(post => post.user_id === uid);
+      console.log('Found', myPosts.length, 'posts');
+      setPosts(myPosts);
     } catch (err) {
-      console.error('Failed to fetch posts:', err);
+      console.log('Error fetching posts:', err);
     }
   };
 

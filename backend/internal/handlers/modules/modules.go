@@ -37,13 +37,16 @@ const (
 )
 
 func HandleList(w http.ResponseWriter, r *http.Request) (*api.Response, error) {
+	// get database connection
 	db := database.GetDB()
 
+	// get all modules
 	modules, err := dataaccess.ListModules(db)
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf(ErrRetrieveModules, ListModules))
 	}
 
+	// convert to json
 	data, err := json.Marshal(modules)
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf(ErrEncodeView, ListModules))

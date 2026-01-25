@@ -22,6 +22,7 @@ export const CommentForm: React.FC<CommentFormProps> = ({ postId, onCommentAdded
 
     const handleSubmit = async () => {
       if (!body.trim()) return;
+      // check user logged in
       if (!user) {
         setError('Please sign in first.');
         return;
@@ -30,12 +31,13 @@ export const CommentForm: React.FC<CommentFormProps> = ({ postId, onCommentAdded
         setSubmitting(true);
         setError(null);
         try {
+          console.log('Posting comment:', body);
           await api.createComment(postId, user.user_id, body.trim());
             setBody('');
             onCommentAdded();
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Failed to submit comment');
-            console.error('Error submitting comment:', err);
+            console.log('Error submitting comment:', err);
         } finally {
             setSubmitting(false);
         }

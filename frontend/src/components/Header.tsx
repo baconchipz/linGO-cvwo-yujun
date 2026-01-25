@@ -23,20 +23,22 @@ export const Header: React.FC<HeaderProps> = ({ onPostClick }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const { user, logout } = useUser();
 
-  // handle search submit
+  // handle search
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      const moduleMatch = searchQuery.match(/[a-zA-Z]*\d+/);
-      if (moduleMatch) {
-        const moduleCode = moduleMatch[0].toUpperCase();
+      const match = searchQuery.match(/[a-zA-Z]*\d+/);
+      if (match) {
+        const code = match[0].toUpperCase();
+        console.log('Searching for module:', code);
         try {
-          const response = await api.getModuleByCode(moduleCode);
-          if (response.payload.data) {
-            navigate(`/module/${response.payload.data.module_id}`);
+          const res = await api.getModuleByCode(code);
+          if (res.payload.data) {
+            console.log('Found module:', res.payload.data);
+            navigate(`/module/${res.payload.data.module_id}`);
           }
-        } catch (error) {
-          console.error('Module not found', error);
+        } catch (err) {
+          console.log('Module not found', err);
         }
       } else {
         navigate(`/search?q=${encodeURIComponent(searchQuery)}`);

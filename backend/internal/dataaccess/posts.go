@@ -8,8 +8,9 @@ import (
 	"time"
 )
 
-// List all non-deleted posts
+// get all posts that are not deleted
 func ListPosts(db *database.Database) ([]models.Post, error) {
+	// query posts and join with modules to get module_code
 	rows, err := db.Query(`
         SELECT p.post_id, p.user_id, p.title, p.body, p.module_id,
                m.module_code,

@@ -31,27 +31,31 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
+  // get modules when modal opens
   useEffect(() => {
-    const fetchModules = async () => {
+    const getModules = async () => {
       try {
-        const response = await api.listModules();
-        if (response.payload.data) {
-          setModules(response.payload.data);
-          if (response.payload.data.length > 0) {
-            setModuleId(response.payload.data[0].module_id);
+        const res = await api.listModules();
+        if (res.payload.data) {
+          console.log('Got modules:', res.payload.data);
+          setModules(res.payload.data);
+          // set first module as default
+          if (res.payload.data.length > 0) {
+            setModuleId(res.payload.data[0].module_id);
           }
         }
       } catch (err) {
-        console.error('Failed to fetch modules', err);
+        console.log('Error getting modules', err);
       }
     };
     if (open) {
-      fetchModules();
+      getModules();
     }
   }, [open]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    // check if user is logged in
     if (!user) {
       setError('Please sign in first.');
       return;
@@ -60,12 +64,16 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({
     setError(null);
 
     try {
+      console.log('Creating post:', { title, body, moduleId });
       await api.createPost(user.user_id, title, body, moduleId);
+      console.log('Post created!');
+      // clear form
       setTitle('');
       setBody('');
       onClose();
       onPostCreated();
     } catch (err) {
+      console.log('Error creating post:', err);
       setError(err instanceof Error ? err.message : 'Failed to create post');
     } finally {
       setSubmitting(false);
