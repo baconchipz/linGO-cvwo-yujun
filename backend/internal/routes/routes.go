@@ -97,6 +97,18 @@ func GetRoutes() func(r chi.Router) {
 			json.NewEncoder(w).Encode(response)
 		})
 
+		r.Get("/modules/code/{moduleCode}", func(w http.ResponseWriter, req *http.Request) {
+			response, err := modules.HandleGetByCode(w, req)
+
+			w.Header().Set("Content-Type", "application/json")
+			if err != nil {
+				w.WriteHeader(http.StatusNotFound)
+				json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+				return
+			}
+			json.NewEncoder(w).Encode(response)
+		})
+
 		r.Get("/modules/{moduleId}", func(w http.ResponseWriter, req *http.Request) {
 			response, err := modules.HandleGet(w, req)
 

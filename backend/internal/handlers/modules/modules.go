@@ -11,6 +11,7 @@ import (
 	"modgo/internal/database"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/google/uuid"
 	"github.com/pkg/errors"
 )
 
@@ -60,7 +61,7 @@ func HandleGet(w http.ResponseWriter, r *http.Request) (*api.Response, error) {
 	db := database.GetDB()
 
 	moduleIDStr := chi.URLParam(r, "moduleId")
-	moduleID, err := strconv.Atoi(moduleIDStr)
+	moduleID, err := uuid.Parse(moduleIDStr)
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf(ErrInvalidModuleID, GetModule))
 	}
@@ -80,6 +81,29 @@ func HandleGet(w http.ResponseWriter, r *http.Request) (*api.Response, error) {
 			Data: data,
 		},
 		Messages: []string{SuccessfulGetModuleMessage},
+	}, nil
+}
+
+func HandleGetByCode(w http.ResponseWriter, r *http.Request) (*api.Response, error) {
+	db := database.GetDB()
+
+	moduleCode := chi.URLParam(r, "moduleCode")
+	
+	module, err := dataaccess.GetModuleByCode(db, moduleCode)
+	if err != nil {
+		return nil, errors.Wrap(err, fmt.Sprintf(ErrRetrieveModule, GetModule))
+	}
+
+	data, err := json.Marshal(module)
+	if err != nil {
+		return nil, errors.Wrap(err, "Failed to encode response")
+	}
+
+	return &api.Response{
+		Payload: api.Payload{
+			Data: data,
+		},
+		Messages: []string{"Successfully retrieved module"},
 	}, nil
 }
 
@@ -120,7 +144,7 @@ func HandleSubscribe(w http.ResponseWriter, r *http.Request) (*api.Response, err
 	}
 
 	moduleIDStr := chi.URLParam(r, "moduleId")
-	moduleID, err := strconv.Atoi(moduleIDStr)
+	moduleID, err := uuid.Parse(moduleIDStr)
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf(ErrInvalidModuleID, SubscribeModule))
 	}
@@ -148,7 +172,7 @@ func HandleUnsubscribe(w http.ResponseWriter, r *http.Request) (*api.Response, e
 	}
 
 	moduleIDStr := chi.URLParam(r, "moduleId")
-	moduleID, err := strconv.Atoi(moduleIDStr)
+	moduleID, err := uuid.Parse(moduleIDStr)
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf(ErrInvalidModuleID, UnsubscribeModule))
 	}
