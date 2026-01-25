@@ -73,19 +73,34 @@ SELECT
 FROM user_modules um
 JOIN module_id_mapping m ON um.module_id = m.old_id;
 
--- Drop old tables
-DROP TABLE IF EXISTS user_modules;
-DROP TABLE IF EXISTS posts;
-DROP TABLE IF EXISTS modules;
+-- Drop old tables (CASCADE to handle dependencies)
+DROP TABLE IF EXISTS user_modules CASCADE;
+DROP TABLE IF EXISTS comments CASCADE;
+DROP TABLE IF EXISTS posts CASCADE;
+DROP TABLE IF EXISTS modules CASCADE;
 
 -- Rename new tables
 ALTER TABLE modules_new RENAME TO modules;
 ALTER TABLE posts_new RENAME TO posts;
 ALTER TABLE user_modules_new RENAME TO user_modules;
 
+-- Recreate comments table (it was dropped with CASCADE)
+CREATE TABLE IF NOT EXISTS comments (
+    comment_id BIGSERIAL PRIMARY KEY,
+    post_id BIGINT NOT NULL REFERENCES posts(post_id) ON DELETE RESTRICT,
+    user_id BIGINT NOT NULL REFERENCES users(user_id) ON DELETE RESTRICT,
+    body TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    deleted_at TIMESTAMP,
+    like_count INT DEFAULT 0
+);
+
 -- Recreate indexes
 CREATE INDEX IF NOT EXISTS idx_posts_user_id ON posts(user_id);
 CREATE INDEX IF NOT EXISTS idx_posts_module_id ON posts(module_id);
+CREATE INDEX IF NOT EXISTS idx_comments_post_id ON comments(post_id);
+CREATE INDEX IF NOT EXISTS idx_comments_user_id ON comments(user_id);
 CREATE INDEX IF NOT EXISTS idx_user_modules_user_id ON user_modules(user_id);
 CREATE INDEX IF NOT EXISTS idx_user_modules_module_id ON user_modules(module_id);
 CREATE INDEX IF NOT EXISTS idx_modules_code ON modules(module_code);

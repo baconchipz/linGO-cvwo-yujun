@@ -88,7 +88,7 @@ func HandleGetByCode(w http.ResponseWriter, r *http.Request) (*api.Response, err
 	db := database.GetDB()
 
 	moduleCode := chi.URLParam(r, "moduleCode")
-	
+
 	module, err := dataaccess.GetModuleByCode(db, moduleCode)
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf(ErrRetrieveModule, GetModule))
