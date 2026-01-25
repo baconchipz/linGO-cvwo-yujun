@@ -135,3 +135,10 @@ export async function deleteComment(postId: number, commentId: number) {
   });
   return res.json() as Promise<ApiResponse<any>>;
 }
+// Like a post
+export async function likePost(postId: number) {
+  const res = await fetch(`${API_BASE_URL}/posts/${postId}/like`, {
+    method: 'POST',
+  });
+  return res.json() as Promise<ApiResponse<any>>;
+}

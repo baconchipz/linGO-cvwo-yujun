@@ -238,7 +238,18 @@ func GetRoutes() func(r chi.Router) {
 			w.WriteHeader(http.StatusNoContent)
 			json.NewEncoder(w).Encode(response)
 		})
+		// Like post
+		r.Post("/posts/{postId}/like", func(w http.ResponseWriter, req *http.Request) {
+			response, err := posts.HandleLike(w, req)
 
+			w.Header().Set("Content-Type", "application/json")
+			if err != nil {
+				w.WriteHeader(http.StatusBadRequest)
+				json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+				return
+			}
+			json.NewEncoder(w).Encode(response)
+		})
 		// Comment modification endpoints
 		r.Put("/posts/{postId}/comments/{commentId}", func(w http.ResponseWriter, req *http.Request) {
 			response, err := comments.HandleUpdate(w, req)

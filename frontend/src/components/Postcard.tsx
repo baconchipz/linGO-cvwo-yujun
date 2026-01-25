@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Box,
@@ -13,6 +13,7 @@ import {
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import CommentIcon from '@mui/icons-material/ChatBubbleOutline';
 import { Post } from '../types/api';
+import * as api from '../api/client';
 
 interface PostcardProps {
     post: Post;
@@ -21,6 +22,21 @@ interface PostcardProps {
 
 export const Postcard: React.FC<PostcardProps> = ({ post, showModule = true }) => {
     const navigate = useNavigate();
+    const [likeCount, setLikeCount] = useState(post.like_count);
+    const [isLiking, setIsLiking] = useState(false);
+
+    const handleLike = async () => {
+      try {
+        setIsLiking(true);
+        console.log('Liking post:', post.post_id);
+        await api.likePost(post.post_id);
+        setLikeCount(likeCount + 1);
+      } catch (err) {
+        console.log('Error liking post', err);
+      } finally {
+        setIsLiking(false);
+      }
+    };
 
   return (
     <Card sx={{ bgcolor: '#1a1a1b', borderRadius: 2 }}>
@@ -35,11 +51,16 @@ export const Postcard: React.FC<PostcardProps> = ({ post, showModule = true }) =
               minWidth: 40,
             }}
           >
-            <IconButton size="small" sx={{ color: '#818384' }}>
+            <IconButton 
+              size="small" 
+              onClick={handleLike}
+              disabled={isLiking}
+              sx={{ color: '#818384', '&:hover': { color: '#ff6b35' } }}
+            >
               <ThumbUpIcon fontSize="small" />
             </IconButton>
             <Typography sx={{ color: '#d7dadc', fontWeight: 600, fontSize: 14 }}>
-              {post.like_count}
+              {likeCount}
             </Typography>
           </Box>
 

@@ -22,6 +22,7 @@ export const Home: React.FC<HomeProps> = ({ openCreatePost, onCloseCreatePost })
   const [posts, setPosts] = useState<Post[]>([]);
   const [userModules, setUserModules] = useState<string[]>([]);
   const [selectedModule, setSelectedModule] = useState<string | null>(null);
+  const [sortBy, setSortBy] = useState<'recent' | 'popular'>('recent');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -62,10 +63,16 @@ export const Home: React.FC<HomeProps> = ({ openCreatePost, onCloseCreatePost })
 
   const getFilteredPosts = () => {
     // if home (null), show all posts, otherwise filter by module
-    if (selectedModule === null) {
-      return posts;
+    let filtered = selectedModule === null ? posts : posts.filter(post => post.module_code === selectedModule);
+    
+    // sort by recent or popular
+    if (sortBy === 'popular') {
+      filtered = filtered.sort((a, b) => b.like_count - a.like_count);
+    } else {
+      filtered = filtered.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
     }
-    return posts.filter(post => post.module_code === selectedModule);
+    
+    return filtered;
   };
 
   if (loading) return <Box sx={{ p: 3 }}><Typography>Loading posts...</Typography></Box>;
@@ -88,7 +95,9 @@ export const Home: React.FC<HomeProps> = ({ openCreatePost, onCloseCreatePost })
         <ModuleFilter
           userModules={userModules}
           selectedModule={selectedModule}
+          sortBy={sortBy}
           onModuleSelect={setSelectedModule}
+          onSortChange={setSortBy}
         />
 
         {/* right feed */}

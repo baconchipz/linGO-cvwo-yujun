@@ -100,3 +100,27 @@ func DeletePost(db *database.Database, postID int) error {
 	}
 	return nil
 }
+
+// Increment like count for a post
+func LikePost(db *database.Database, postID int) (models.Post, error) {
+	var post models.Post
+	var deletedAt sql.NullTime
+	err := db.QueryRow(`
+		UPDATE posts
+		SET like_count = like_count + 1
+		WHERE post_id = $1 AND deleted_at IS NULL
+		RETURNING post_id, user_id, title, body, module_id,
+				  created_at, updated_at, deleted_at, like_count, comment_count`,
+		postID,
+	).Scan(
+		&post.PostID, &post.UserID, &post.Title, &post.Body, &post.ModuleID,
+		&post.CreatedAt, &post.UpdatedAt, &deletedAt, &post.LikeCount, &post.CommentCount,
+	)
+	if err != nil {
+		return models.Post{}, err
+	}
+	if deletedAt.Valid {
+		post.DeletedAt = &deletedAt.Time
+	}
+	return post, nil
+}
