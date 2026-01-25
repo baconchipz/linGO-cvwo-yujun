@@ -7,22 +7,27 @@ import {
   Stack,
   Chip,
 } from '@mui/material';
+import { useUser } from '../context/UserContext';
 import * as api from '../api/client';
 import { Module } from '../types/api';
 
 export const ModuleSelection: React.FC = () => {
+  const { user } = useUser();
   const [allModules, setAllModules] = useState<Module[]>([]);
-  const [userModules, setUserModules] = useState<string[]>([]);
+  const [userModuleIds, setUserModuleIds] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // get all modules when component loads
+  // fetch all modules and user's selected modules on load
   useEffect(() => {
     fetchModules();
-  }, []);
+    if (user) {
+      fetchUserModules();
+    }
+  }, [user]);
 
   const fetchModules = async () => {
     try {
-      console.log('Getting all modules...');
+      console.log('Getting all modules');
       const res = await api.listModules();
       if (res.payload.data) {
         console.log('Got modules:', res.payload.data);
@@ -30,26 +35,52 @@ export const ModuleSelection: React.FC = () => {
       }
       setLoading(false);
     } catch (err) {
-      console.log('Error loading modules:', err);
+      console.log('Error loading modules', err);
       setLoading(false);
     }
   };
 
-  // add module to my modules
-  const handleAddModule = (moduleId: string) => {
-    console.log('Adding module:', moduleId);
-    setUserModules([...userModules, moduleId]);
+  const fetchUserModules = async () => {
+    try {
+      if (!user) return;
+      console.log('Fetching user modules');
+      const res = await api.getUserModules(user.user_id);
+      const mods = res.payload.data || [];
+      const ids = mods.map((m: any) => m.module_id);
+      console.log('Got user module ids:', ids);
+      setUserModuleIds(ids);
+    } catch (err) {
+      console.log('Error loading user modules', err);
+    }
   };
 
-  // remove module from my modules
-  const handleRemoveModule = (moduleId: string) => {
-    console.log('Removing module:', moduleId);
-    setUserModules(userModules.filter(id => id !== moduleId));
+  // subscribe to module and save to backend
+  const handleAddModule = async (moduleId: string) => {
+    try {
+      if (!user) return;
+      console.log('Adding module:', moduleId);
+      await api.subscribeToModule(user.user_id, moduleId);
+      setUserModuleIds([...userModuleIds, moduleId]);
+    } catch (err) {
+      console.log('Error subscribing to module', err);
+    }
+  };
+
+  // unsubscribe from module and save to backend
+  const handleRemoveModule = async (moduleId: string) => {
+    try {
+      if (!user) return;
+      console.log('Removing module:', moduleId);
+      await api.unsubscribeFromModule(user.user_id, moduleId);
+      setUserModuleIds(userModuleIds.filter(id => id !== moduleId));
+    } catch (err) {
+      console.log('Error unsubscribing from module', err);
+    }
   };
 
   // check if module is selected
   const isSelected = (moduleId: string) => {
-    return userModules.includes(moduleId);
+    return userModuleIds.includes(moduleId);
   };
 
   if (loading) {
@@ -67,13 +98,13 @@ export const ModuleSelection: React.FC = () => {
         <Typography variant="h5" sx={{ color: '#d7dadc', mb: 2, fontWeight: 600 }}>
           My Modules
         </Typography>
-        {userModules.length === 0 ? (
+        {userModuleIds.length === 0 ? (
           <Typography sx={{ color: '#818384', fontStyle: 'italic' }}>
             No modules selected yet. Click on modules below to add them.
           </Typography>
         ) : (
           <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
-            {userModules.map((moduleId) => {
+            {userModuleIds.map((moduleId) => {
               const module = allModules.find(m => m.module_id === moduleId);
               return (
                 <Chip
@@ -150,11 +181,11 @@ export const ModuleSelection: React.FC = () => {
         </Box>
       </Box>
 
-      {/* Debug info */}
-      {userModules.length > 0 && (
+      {/* debug info */}
+      {userModuleIds.length > 0 && (
         <Box sx={{ mt: 4, p: 2, bgcolor: '#1a1a1b', borderRadius: 2 }}>
           <Typography variant="caption" sx={{ color: '#818384' }}>
-            Selected module IDs: {userModules.join(', ')}
+            Selected module IDs: {userModuleIds.join(', ')}
           </Typography>
         </Box>
       )}
