@@ -1,24 +1,58 @@
 package main
 
 import (
-	"fmt"
-	"log"
-	"net/http"
+    "fmt"
+    "log"
+    "net/http"
+    "os"
 
-	"modgo/internal/database"
-	"modgo/internal/router"
+    "github.com/go-chi/cors"
+
+    "modgo/internal/database"
+    "modgo/internal/router"
 )
 
 func main() {
-	// Initialize database connection
-	err := database.Init("localhost", "5432", "jadonkohyujun", "", "jadonkohyujun")
-	if err != nil {
-		log.Fatalf("Failed to connect to database: %v", err)
-	}
-	fmt.Println("Connected to database successfully!")
+    // DB config from environment (with local fallbacks)
+    dbHost := getenv("DB_HOST", "localhost")
+    dbPort := getenv("DB_PORT", "5432")
+    dbUser := getenv("DB_USER", "jadonkohyujun")
+    dbPass := getenv("DB_PASS", "")
+    dbName := getenv("DB_NAME", "jadonkohyujun")
 
-	r := router.Setup()
-	fmt.Println("Listening on port 8080 at http://localhost:8080!")
+    // Initialize database connection
+    err := database.Init(dbHost, dbPort, dbUser, dbPass, dbName)
+    if err != nil {
+        log.Fatalf("Failed to connect to database: %v", err)
+    }
+    fmt.Println("Connected to database successfully!")
 
-	log.Fatalln(http.ListenAndServe(":8080", r))
+    r := router.Setup()
+
+    // CORS: replace with your actual Netlify domain when you have it
+    r.Use(cors.Handler(cors.Options{
+        AllowedOrigins:   []string{"https://your-netlify-site.netlify.app"},
+        AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+        AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
+        ExposedHeaders:   []string{"Link"},
+        AllowCredentials: true,
+        MaxAge:           300,
+    }))
+
+    // Respect PORT from environment (Render/Heroku/etc.), default to 8080 locally
+    port := os.Getenv("PORT")
+    if port == "" {
+        port = "8080"
+    }
+
+    log.Printf("Listening on :%s ...", port)
+    log.Fatalln(http.ListenAndServe(":"+port, r))
+}
+
+// getenv returns env var or fallback
+func getenv(key, fallback string) string {
+    if v := os.Getenv(key); v != "" {
+        return v
+    }
+    return fallback
 }
