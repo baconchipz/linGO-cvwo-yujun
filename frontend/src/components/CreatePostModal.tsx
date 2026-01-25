@@ -106,6 +106,9 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({
                 color: '#d7dadc',
                 borderRadius: 1,
               },
+              '& .MuiInputLabel-root': {
+                color: '#ffffff',
+              },
             }}
           >
             <option value="1">CS2030</option>

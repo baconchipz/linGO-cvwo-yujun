@@ -108,7 +108,7 @@ export const PostDetail: React.FC = () => {
                 <Typography
                   variant="caption"
                   sx={{
-                    color: '#d7dadc',
+                    color: '#ffffff',
                     fontWeight: 600,
                     fontSize: 13,
                     cursor: 'pointer',

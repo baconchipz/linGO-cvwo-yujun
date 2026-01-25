@@ -136,7 +136,7 @@ export const Profile: React.FC = () => {
           My Profile
         </Typography>
         <Typography sx={{ color: '#818384' }}>
-          User {currentUserId}
+          {user?.username}
         </Typography>
       </Box>
 

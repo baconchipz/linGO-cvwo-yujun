@@ -50,7 +50,7 @@ export const Postcard: React.FC<PostcardProps> = ({ post, showModule = true }) =
                 <Typography
                   variant="caption"
                   sx={{
-                    color: '#d7dadc',
+                    color: '#ffffff',
                     fontWeight: 600,
                     fontSize: 13,
                   }}

@@ -12,6 +12,7 @@ import {
   InputAdornment,
 } from '@mui/material';
 import { useUser } from '../context/UserContext';
+import * as api from '../api/client';
 
 interface HeaderProps {
   onPostClick?: () => void;
@@ -23,14 +24,26 @@ export const Header: React.FC<HeaderProps> = ({ onPostClick }) => {
   const { user, logout } = useUser();
 
   // handle search submit
-  const handleSearch = (e: React.FormEvent) => {
+  const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      // Extract full module code (e.g., "CS2030", "cs2030", "2030")
       const moduleMatch = searchQuery.match(/[a-zA-Z]*\d+/);
       if (moduleMatch) {
         const moduleCode = moduleMatch[0].toUpperCase();
-        navigate(`/module/${moduleCode}`);
+        try {
+          const response = await api.listModules();
+          const module = response.payload.data.find(
+            (m: any) => m.module_title.toUpperCase() === moduleCode
+          );
+          if (module) {
+            navigate(`/module/${module.module_id}`);
+          } else {
+            navigate(`/search?q=${encodeURIComponent(searchQuery)}`);
+          }
+        } catch (err) {
+          console.error('Failed to search modules:', err);
+          navigate(`/search?q=${encodeURIComponent(searchQuery)}`);
+        }
       } else {
         navigate(`/search?q=${encodeURIComponent(searchQuery)}`);
       }
