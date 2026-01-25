@@ -21,10 +21,10 @@ export const ModuleFilter: React.FC<ModuleFilterProps> = ({
       sx={{
         width: '250px',
         position: 'sticky',
-        top: 60,
+        top: 90,
         backgroundColor: '#0f1419',
         borderRight: '1px solid #1a1a1b',
-        height: '100vh',
+        height: 'calc(100vh - 90px)',
         overflowY: 'auto',
         p: 2,
       }}

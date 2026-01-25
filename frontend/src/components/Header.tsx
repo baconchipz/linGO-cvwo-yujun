@@ -57,11 +57,11 @@ export const Header: React.FC<HeaderProps> = ({ onPostClick }) => {
   };
 
   return (
-    <AppBar position="sticky" elevation={0} sx={{ bgcolor: 'transparent', pt: 1.5 }}>
+    <AppBar position="sticky" elevation={0} sx={{ bgcolor: 'transparent', top: 0, zIndex: 100 }}>
       <Box
         sx={{
           px: 2,
-          pb: 1.5,
+          py: 1.5,
           background: 'linear-gradient(90deg, #071021 0%, #081a34 50%, #081224 100%)',
         }}
       >

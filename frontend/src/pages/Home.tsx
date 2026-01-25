@@ -6,7 +6,6 @@ import {
   Box,
   Typography,
   Stack,
-  Container,
 } from '@mui/material';
 import { Post } from '../types/api';
 import { useUser } from '../context/UserContext';
@@ -90,7 +89,7 @@ export const Home: React.FC<HomeProps> = ({ openCreatePost, onCloseCreatePost })
       />
 
       {/* main layout */}
-      <Box sx={{ display: 'flex' }}>
+      <Box sx={{ display: 'flex', width: '100vw', backgroundColor: '#030303', minHeight: '100vh' }}>
         {/* left sidebar */}
         <ModuleFilter
           userModules={userModules}
@@ -100,9 +99,9 @@ export const Home: React.FC<HomeProps> = ({ openCreatePost, onCloseCreatePost })
           onSortChange={setSortBy}
         />
 
-        {/* right feed */}
-        <Box sx={{ flex: 1, backgroundColor: '#030303', minHeight: '100vh' }}>
-          <Container maxWidth="md" sx={{ py: 3 }}>
+        {/* center feed - fixed width with centered content */}
+        <Box sx={{ flex: 1, display: 'flex', justifyContent: 'center', px: 3, pt: 0, pb: 3 }}>
+          <Box sx={{ width: '100%', maxWidth: '1000px' }}>
             <Stack spacing={2}>
               {filteredPosts.length > 0 ? (
                 filteredPosts.map(post => (
@@ -114,7 +113,7 @@ export const Home: React.FC<HomeProps> = ({ openCreatePost, onCloseCreatePost })
                 </Box>
               )}
             </Stack>
-          </Container>
+          </Box>
         </Box>
       </Box>
     </>
