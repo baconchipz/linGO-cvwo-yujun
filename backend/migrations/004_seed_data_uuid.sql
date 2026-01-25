@@ -4,14 +4,36 @@
 INSERT INTO modules (module_code, module_title, description) VALUES
 ('CS2030', 'Programming Methodology II', 'Programming Methodology II'),
 ('CS2040', 'Data Structures and Algorithms', 'Data Structures and Algorithms'),
-('CS3230', 'Design and Analysis of Algorithms', 'Design and Analysis of Algorithms')
+('CS3230', 'Design and Analysis of Algorithms', 'Design and Analysis of Algorithms'),
+('CS2100', 'Computer Organisation', 'Computer Organisation'),
+('CS2103T', 'Software Engineering', 'Software Engineering'),
+('CS2106', 'Introduction to Operating Systems', 'Introduction to Operating Systems'),
+('CS3240', 'Interaction Design', 'Interaction Design'),
+('MA1521', 'Calculus for Computing', 'Calculus for Computing'),
+('MA1522', 'Linear Algebra for Computing', 'Linear Algebra for Computing'),
+('ST2334', 'Probability and Statistics', 'Probability and Statistics'),
+('IS1108', 'Digital Ethics and Data Privacy', 'Digital Ethics and Data Privacy'),
+('CS1101S', 'Programming Methodology', 'Programming Methodology'),
+('CS1231S', 'Discrete Structures', 'Discrete Structures'),
+('CS2101', 'Effective Communication for Computing Professionals', 'Effective Communication for Computing Professionals'),
+('CS3243', 'Introduction to Artificial Intelligence', 'Introduction to Artificial Intelligence')
 ON CONFLICT (module_code) DO NOTHING;
 
 -- Insert sample users (password is hashed version of "password123")
 INSERT INTO users (username, password) VALUES
 ('john_doe', 'password123'),
 ('jane_smith', 'password123'),
-('bob_wilson', 'password123')
+('bob_wilson', 'password123'),
+('alice_tan', 'password123'),
+('david_lim', 'password123'),
+('emma_wong', 'password123'),
+('frank_chen', 'password123'),
+('grace_ng', 'password123'),
+('henry_koh', 'password123'),
+('iris_teo', 'password123'),
+('jack_lee', 'password123'),
+('kelly_goh', 'password123'),
+('lucas_ong', 'password123')
 ON CONFLICT (username) DO NOTHING;
 
 -- Insert sample posts (using module UUIDs)

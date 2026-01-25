@@ -26,7 +26,8 @@ func main() {
 
 	fmt.Println("Connected to database!")
 
-	sqlBytes, err := os.ReadFile("migrations/004_seed_data_uuid.sql")
+	// read and run migration
+	sqlBytes, err := os.ReadFile("migrations/005_extended_seed_data.sql")
 	if err != nil {
 		log.Fatal("Failed to read migration file:", err)
 	}
