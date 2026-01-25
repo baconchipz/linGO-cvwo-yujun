@@ -6,6 +6,7 @@ import {
   Typography,           
 } from '@mui/material';
 import * as api from '../api/client';
+import { useUser } from '../context/UserContext';
 
 interface CommentFormProps {
     postId: number;
@@ -14,17 +15,22 @@ interface CommentFormProps {
 
 // Component for submitting a new comment
 export const CommentForm: React.FC<CommentFormProps> = ({ postId, onCommentAdded }) => {
+  const { user } = useUser();
     const [body, setBody] = useState('');
     const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
     const handleSubmit = async () => {
-        if (!body.trim()) return;
+      if (!body.trim()) return;
+      if (!user) {
+        setError('Please sign in first.');
+        return;
+      }
 
         setSubmitting(true);
         setError(null);
         try {
-            await api.createComment(postId, 1, body.trim());
+          await api.createComment(postId, user.user_id, body.trim());
             setBody('');
             onCommentAdded();
         } catch (err) {
@@ -71,7 +77,7 @@ export const CommentForm: React.FC<CommentFormProps> = ({ postId, onCommentAdded
         <Button
           variant="contained"
           onClick={handleSubmit}
-          disabled={submitting || !body.trim()}
+          disabled={submitting || !body.trim() || !user}
           sx={{
             bgcolor: '#0079d3',
             color: '#fff',

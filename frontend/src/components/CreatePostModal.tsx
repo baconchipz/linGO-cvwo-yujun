@@ -9,6 +9,7 @@ import {
   DialogActions,
 } from '@mui/material';
 import * as api from '../api/client';
+import { useUser } from '../context/UserContext';
 
 interface CreatePostModalProps {
   open: boolean;
@@ -21,6 +22,7 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({
   onClose,
   onPostCreated,
 }) => {
+  const { user } = useUser();
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
   const [moduleId, setModuleId] = useState('1');
@@ -29,11 +31,15 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!user) {
+      setError('Please sign in first.');
+      return;
+    }
     setSubmitting(true);
     setError(null);
 
     try {
-      await api.createPost(1, title, body, parseInt(moduleId) || 1);
+      await api.createPost(user.user_id, title, body, parseInt(moduleId) || 1);
       setTitle('');
       setBody('');
       setModuleId('1');
@@ -140,7 +146,7 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({
           type="submit"
           form="create-post-form"
           variant="contained"
-          disabled={submitting || !title || !body}
+          disabled={submitting || !title || !body || !user}
           sx={{
             bgcolor: '#0079d3',
             textTransform: 'none',

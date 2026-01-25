@@ -13,8 +13,10 @@ import { EditPostModal } from '../components/EditPostModal';
 import { DeleteConfirmDialog } from '../components/DeleteConfirmDialog';
 import { EditCommentModal } from '../components/EditCommentModal';
 import * as api from '../api/client';
+import { useUser } from '../context/UserContext';
 
 export const Profile: React.FC = () => {
+  const { user } = useUser();
   const [activeTab, setActiveTab] = useState(0);
   const [posts, setPosts] = useState<Post[]>([]);
   const [comments, setComments] = useState<Comment[]>([]);
@@ -26,19 +28,20 @@ export const Profile: React.FC = () => {
   const [editingComment, setEditingComment] = useState<Comment | null>(null);
   const [deletingCommentId, setDeletingCommentId] = useState<number | null>(null);
   const [isDeletingComment, setIsDeletingComment] = useState(false);
-  // Mock user ID - replace with actual auth later
-  const currentUserId = 1;
+  const currentUserId = user?.user_id;
 
   useEffect(() => {
-    fetchUserPosts();
-    fetchUserComments();
-  }, []);
+    if (currentUserId) {
+      fetchUserPosts(currentUserId);
+      fetchUserComments(currentUserId);
+    }
+  }, [currentUserId]);
 
   // Fetch posts created by the current user
-  const fetchUserPosts = async () => {
+  const fetchUserPosts = async (uid: number) => {
     try {
       const response = await api.listPosts();
-      const userPosts = response.payload.data.filter(post => post.user_id === currentUserId);
+      const userPosts = response.payload.data.filter(post => post.user_id === uid);
       setPosts(userPosts);
     } catch (err) {
       console.error('Failed to fetch posts:', err);
@@ -46,14 +49,14 @@ export const Profile: React.FC = () => {
   };
 
   // Fetch comments made by the current user - optimized with parallel requests
-  const fetchUserComments = async () => {
+  const fetchUserComments = async (uid: number) => {
     try {
       const response = await api.listPosts();
       const allPosts = response.payload.data;
       
       // Only fetch comments for posts that the current user created
       const userPostIds = allPosts
-        .filter(post => post.user_id === currentUserId)
+        .filter(post => post.user_id === uid)
         .map(post => post.post_id);
       
       if (userPostIds.length === 0) {
@@ -70,7 +73,7 @@ export const Profile: React.FC = () => {
         .filter(comment => comment !== null && comment !== undefined);
       
       // Filter comments by current user
-      const userComments = allComments.filter(comment => comment.user_id === currentUserId);
+      const userComments = allComments.filter(comment => comment.user_id === uid);
       setComments(userComments);
     } catch (err) {
       console.error('Failed to fetch comments:', err);
@@ -89,7 +92,7 @@ export const Profile: React.FC = () => {
     setIsDeleting(true);
     try {
       await api.deletePost(postId);
-      fetchUserPosts();
+      if (currentUserId) fetchUserPosts(currentUserId);
       setDeletingPostId(null);
       setDeleteConfirmOpen(false);
     } catch (error) {
@@ -113,7 +116,7 @@ export const Profile: React.FC = () => {
 
     try {
       await api.deleteComment(comment.post_id, commentId);
-      fetchUserComments();
+      if (currentUserId) fetchUserComments(currentUserId);
       setDeletingCommentId(null);
     } catch (error) {
       console.error('Failed to delete comment:', error);
@@ -122,6 +125,7 @@ export const Profile: React.FC = () => {
     }
   };
 
+  if (!currentUserId) return <Box sx={{ p: 3 }}><Typography>Please sign in.</Typography></Box>;
   if (loading) return <Box sx={{ p: 3 }}><Typography>Loading...</Typography></Box>;
 
   return (

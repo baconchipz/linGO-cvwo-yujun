@@ -11,6 +11,7 @@ import {
   Typography,
   InputAdornment,
 } from '@mui/material';
+import { useUser } from '../context/UserContext';
 
 interface HeaderProps {
   onPostClick?: () => void;
@@ -19,6 +20,7 @@ interface HeaderProps {
 export const Header: React.FC<HeaderProps> = ({ onPostClick }) => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
+  const { user, logout } = useUser();
 
   // handle search submit
   const handleSearch = (e: React.FormEvent) => {
@@ -38,6 +40,11 @@ export const Header: React.FC<HeaderProps> = ({ onPostClick }) => {
 
   const handleNavigation = (path: string) => {
     navigate(path);
+  };
+
+  const handleLogout = () => {
+    logout();
+    navigate('/');
   };
 
   return (
@@ -134,6 +141,26 @@ export const Header: React.FC<HeaderProps> = ({ onPostClick }) => {
 
             {/* Right: Post button */}
             <Stack direction="row" justifyContent="flex-end" sx={{ flex: 1 }}>
+              {user && (
+                <Stack direction="row" spacing={1} alignItems="center" sx={{ mr: 1 }}>
+                  <Typography sx={{ color: '#dce8ff', fontWeight: 600 }}>
+                    {user.username}
+                  </Typography>
+                  <Button
+                    variant="outlined"
+                    onClick={handleLogout}
+                    sx={{
+                      color: '#dce8ff',
+                      borderColor: 'rgba(255,255,255,0.2)',
+                      textTransform: 'none',
+                      fontWeight: 600,
+                      '&:hover': { borderColor: '#dce8ff' },
+                    }}
+                  >
+                    Logout
+                  </Button>
+                </Stack>
+              )}
               <Button
                 variant="contained"
                 onClick={onPostClick}
