@@ -35,6 +35,7 @@ func main() {
         AllowedOrigins:   []string{
 			"https://modgo-yujun.netlify.app",
 			"https://697644e0c7c59a0595e052c4--modgo-yujun.netlify.app", // add this!
+			"https://modgo-cvwo-yujun-front.onrender.com",
 		},
         AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
         AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type"},
