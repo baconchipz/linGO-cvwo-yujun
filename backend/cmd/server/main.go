@@ -1,3 +1,4 @@
+// filepath: backend/cmd/server/main.go
 package main
 
 import (
@@ -6,7 +7,7 @@ import (
     "net/http"
     "os"
 
-    "github.com/go-chi/cors"
+    "github.com/gin-contrib/cors"
 
     "modgo/internal/database"
     "modgo/internal/router"
@@ -30,14 +31,12 @@ func main() {
     r := router.Setup()
 
     // CORS: replace with your actual Netlify domain when you have it
-    r.Use(cors.Handler(cors.Options{
-        AllowedOrigins:   []string{"https://your-netlify-site.netlify.app"},
-        AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-        AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
-        ExposedHeaders:   []string{"Link"},
-        AllowCredentials: true,
-        MaxAge:           300,
-    }))
+    corsCfg := cors.DefaultConfig()
+    corsCfg.AllowOrigins = []string{"https://your-netlify-site.netlify.app"}
+    corsCfg.AllowMethods = []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"}
+    corsCfg.AllowHeaders = []string{"Origin", "Content-Type", "Authorization"}
+    corsCfg.AllowCredentials = true
+    r.Use(cors.New(corsCfg))
 
     // Respect PORT from environment (Render/Heroku/etc.), default to 8080 locally
     port := os.Getenv("PORT")
