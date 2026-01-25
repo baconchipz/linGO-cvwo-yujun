@@ -8,60 +8,65 @@ import { Home } from './pages/Home';
 import { Module } from './pages/Module';
 import { PostDetail } from './pages/PostDetails';
 import { Profile } from './pages/Profile';
+import { UserProvider, useUser } from './context/UserContext';
+import { LoginModal } from './components/LoginModal';
+
+const Shell: React.FC = () => {
+  const { user } = useUser();
+  const [openCreatePost, setOpenCreatePost] = useState(false);
+
+  return (
+    <>
+      <Header onPostClick={() => setOpenCreatePost(true)} />
+      <main className="main-content">
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <Home
+                openCreatePost={openCreatePost}
+                onCloseCreatePost={() => setOpenCreatePost(false)}
+              />
+            }
+          />
+          <Route path="/test" element={<TestApiIntegration />} />
+          <Route path="/module/:moduleId" element={<Module />} />
+          <Route path="/post/:postId" element={<PostDetail />} />
+          <Route
+            path="/modules"
+            element={
+              <div className="placeholder">
+                <h2>My Modules</h2>
+                <p>Your personalized modules will appear here...</p>
+              </div>
+            }
+          />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/users" element={<Users />} />
+          <Route
+            path="/search"
+            element={
+              <div className="placeholder">
+                <h2>Search Results</h2>
+                <p>Search results will appear here...</p>
+              </div>
+            }
+          />
+        </Routes>
+      </main>
+      <LoginModal open={!user} />
+    </>
+  );
+};
 
 export const App: React.FC = () => {
-    const [openCreatePost, setOpenCreatePost] = useState(false);
-
-    return (
-        <Router>
-            <div className="app-container">
-                <Header onPostClick={() => setOpenCreatePost(true)} />
-                <main className="main-content">
-                    <Routes>
-                        <Route 
-                            path="/" 
-                            element={
-                                <Home 
-                                    openCreatePost={openCreatePost}
-                                    onCloseCreatePost={() => setOpenCreatePost(false)}
-                                />
-                            } 
-                        />
-                        <Route path="/test" element={<TestApiIntegration />} />
-                        <Route path="/module/:moduleId" element={<Module />} />
-                        <Route path="/post/:postId" element={<PostDetail />} />
-                        <Route
-                            path="/modules"
-                            element={
-                                <div className="placeholder">
-                                    <h2>My Modules</h2>
-                                    <p>Your personalized modules will appear here...</p>
-                                </div>
-                            }
-                        />
-                        <Route
-                            path="/profile"
-                            element={<Profile />}
-                        />
-                        <Route
-                            path="/users"
-                            element={<Users />} // Using Users component for /users route
-                        />
-
-                        <Route
-                            path="/search"
-                            element={
-                                <div className="placeholder">
-                                    <h2>Search Results</h2>
-                                    <p>Search results will appear here...</p>
-                                </div>
-                            }
-                        />
-                    </Routes>
-                </main>
-            </div>
-        </Router>
-    );
+  return (
+    <UserProvider>
+      <Router>
+        <Shell />
+      </Router>
+    </UserProvider>
+  );
 };
 
 export default App;
